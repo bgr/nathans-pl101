@@ -1,5 +1,9 @@
 var endTime = function (time, expr) {
     switch(expr.tag) {
+        case 'par':
+            var endL = endTime(0, expr.left);
+            var endR = endTime(0, expr.right);
+            return time + ( endL > endR ? endL : endR );
         case 'seq':
             return time + endTime(0, expr.left) + endTime(0, expr.right);
         case 'note':
@@ -10,6 +14,8 @@ var endTime = function (time, expr) {
 
 var compileT = function(time, expr) {
     switch(expr.tag) {
+        case 'par':
+            return [compileT(time,expr.left),compileT(time,expr.right)];
         case 'seq':
             return [compileT(time,expr.left),compileT(endTime(time,expr.right),expr.right)];
         case 'note':
@@ -22,6 +28,10 @@ var compileT = function(time, expr) {
 
 var compile = function (musexpr) {
     switch(musexpr.tag) {
+        case 'par':
+            var l1 = compileT(0, musexpr.left);
+            var r1 = compileT(0, musexpr.right);
+            return l1.concat(r1);
         case 'seq':
             var left = compileT(0, musexpr.left);
             var l = left[left.length-1];
