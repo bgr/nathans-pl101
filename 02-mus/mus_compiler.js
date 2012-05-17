@@ -20,6 +20,8 @@ var convertPitch = function(p) {
 // calculate the ending time of the expression given the starting time
 var endTime = function (time, expr) {
     switch(expr.tag) {
+        case 'repeat':
+            return time + expr.count * endTime(0, expr.section);
         case 'par':
             var endL = endTime(0, expr.left);
             var endR = endTime(0, expr.right);
@@ -35,11 +37,17 @@ var endTime = function (time, expr) {
 // helper function - compile an expression into raw note
 var compileT = function(time, expr) {
     switch(expr.tag) {
+        case 'repeat':
+            var ret = [];
+            var dur = endTime(0, expr.section);
+            var nextTime = time;
+            for(var i=0; i<expr.count; i++) {
+              ret.push(compileT(nextTime, expr.section));
+              nextTime += dur;
+            }
+            return ret;
         case 'par':
-            var l = compileT(time, expr.left);
-            var r = compileT(time, expr.right);
-            //if(Array.isArray(l)) l = 
-            return [l, r];
+            return [compileT(time, expr.left), compileT(time, expr.right)];
         case 'seq':
             return [ compileT(time, expr.left), compileT(endTime(time,expr.left), expr.right) ];
         case 'note':
@@ -49,24 +57,6 @@ var compileT = function(time, expr) {
     }
 };
 
-// compile a MUS expression into raw notes
-var compile = function (musexpr) {
-    switch(musexpr.tag) {
-        case 'par':
-            var l1 = compileT(0, musexpr.left);
-            var r1 = compileT(0, musexpr.right);
-            return l1.concat(r1);
-        case 'seq':
-            var left = compileT(0, musexpr.left);
-            var l = left[left.length-1];
-            var right = compileT(l.start+l.dur, musexpr.right);
-            return left.concat(right);
-        case 'note':
-        case 'rest':
-            var ret = compileT(0,musexpr);
-            return [ ret ];
-    }
-};
 
 // helper function - flatten the compiled note array
 var flatten = function(compiled) {
@@ -85,34 +75,56 @@ var flatten = function(compiled) {
   }
 }
 
+// compile a MUS expression into raw notes
+var compile = function (musexpr) {
+  return flatten(compileT(0,musexpr));
+};
+
+
+
 
 // try it out
 
 var melody_mus = 
-    { tag: 'seq',
+  { tag: 'seq',
+    left: { 
+      tag: 'seq',
       left: {
         tag: 'seq',
-        left: { tag: 'note', pitch: 'a4', dur: 220 },
-        right: { tag: 'rest', dur: 300 } },
+        left: { tag: 'note', pitch: 'a4', dur: 220 },      // s: 0
+        right: { tag: 'rest', dur: 300 } },                // s: 220
       right: { 
         tag: 'par',
-        left: {
-          tag: 'seq',
-          left: { tag: 'note', pitch: 'c4', dur: 480 },
-          right: { tag: 'note', pitch: 'd4', dur: 500 } },
-        right: { 
-          tag: 'seq',
-          left: { 
-            tag: 'par',
-            left: { tag:'note', pitch: 'e4', dur: 80 },
-            right:{ tag:'rest', dur: 30 } },
-          right: { tag:'note', pitch: 'a4', dur: 200 }
-        }
-      }
-    };
+        left: { 
+          tag: 'repeat',
+          count: 3,
+          section: {
+            tag: 'seq',
+            left: { 
+              tag: 'par',
+              left: { tag:'note', pitch: 'e4', dur: 80 },  //   s: 520,   800,   1080
+              right:{ tag:'rest', dur: 30 } },             //   s: 520,   800,   1080
+            right: { tag:'note', pitch: 'a4', dur: 200 }   //     s: 600,   880,   1160
+          }                                                     
+        },                                                      
+        right: {                                                
+          tag: 'seq',                                           
+          left: { tag: 'note', pitch: 'c6', dur: 480 },    //   s: 520
+          right: { tag: 'note', pitch: 'd6', dur: 10 }     //     s: 1000
+        }                                                       
+      }                                                         
+    },                                                          
+    right: {                                                    
+      tag: 'seq',                                               
+      left: { tag: 'note', pitch: 'c0', dur: 10 },         //                       s: 1360
+      right: { tag: 'note', pitch: 'b0', dur: 15 }         //                         s: 1370
+    }
+  };
+  
 
 
 console.log("MUS:");
 console.log(melody_mus);
+console.log();
 console.log("Compiled:");
-console.log(flatten(compile(melody_mus)));
+console.log(compile(melody_mus));

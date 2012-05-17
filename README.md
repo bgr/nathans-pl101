@@ -1,5 +1,5 @@
-Homeworks for Nathan's University Programming Languages 101
-===========================================================
+Homeworks for Nathan's University PL101
+=======================================
 
 Check out the [course site][nu].
 
