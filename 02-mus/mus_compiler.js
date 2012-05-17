@@ -1,3 +1,6 @@
+// Lesson 02: MUS language compiler
+
+// calculate the ending time of the expression given the starting time
 var endTime = function (time, expr) {
     switch(expr.tag) {
         case 'par':
@@ -7,25 +10,29 @@ var endTime = function (time, expr) {
         case 'seq':
             return time + endTime(0, expr.left) + endTime(0, expr.right);
         case 'note':
-            return time + expr.dur;
+        case 'rest':
+          return time + expr.dur;
     }
 };
 
-
+// helper function - compile an expression into raw note
 var compileT = function(time, expr) {
     switch(expr.tag) {
         case 'par':
-            return [compileT(time,expr.left),compileT(time,expr.right)];
+            var l = compileT(time, expr.left);
+            var r = compileT(time, expr.right);
+            //if(Array.isArray(l)) l = 
+            return [l, r];
         case 'seq':
-            return [compileT(time,expr.left),compileT(endTime(time,expr.right),expr.right)];
+            return [ compileT(time, expr.left), compileT(endTime(time,expr.left), expr.right) ];
         case 'note':
             return {tag: 'note', pitch: expr.pitch, start: time, dur: expr.dur };
-        default:
-            log("Error");
+        case 'rest':
+            return {tag: 'rest', start: time, dur: expr.dur };
     }
 };
 
-
+// compile a MUS expression into raw notes
 var compile = function (musexpr) {
     switch(musexpr.tag) {
         case 'par':
@@ -38,25 +45,57 @@ var compile = function (musexpr) {
             var right = compileT(l.start+l.dur, musexpr.right);
             return left.concat(right);
         case 'note':
+        case 'rest':
             var ret = compileT(0,musexpr);
-            log(ret);
-            return [ret];
+            return [ ret ];
     }
 };
 
+// helper function - flatten the compiled note array
+var flatten = function(compiled) {
+  if(Array.isArray(compiled)) {
+    var ret = [];
+    for(var k in compiled) {
+      var fl = flatten(compiled[k]);
+      if(Array.isArray(fl))
+        for(var j in fl) ret.push(fl[j]);
+      else ret.push(fl);
+    }
+    return ret;
+  }
+  else {
+    return compiled;
+  }
+}
+
+
+// try it out
 
 var melody_mus = 
     { tag: 'seq',
-      left: 
-       { tag: 'seq',
-         left: { tag: 'note', pitch: 'a4', dur: 250 },
-         right: { tag: 'note', pitch: 'b4', dur: 250 } },
-      right:
-       { tag: 'seq',
-         left: { tag: 'note', pitch: 'c4', dur: 500 },
-         right: { tag: 'note', pitch: 'd4', dur: 500 } } };
+      left: {
+        tag: 'seq',
+        left: { tag: 'note', pitch: 'a4', dur: 220 },
+        right: { tag: 'rest', dur: 300 } },
+      right: { 
+        tag: 'par',
+        left: {
+          tag: 'seq',
+          left: { tag: 'note', pitch: 'c4', dur: 480 },
+          right: { tag: 'note', pitch: 'd4', dur: 500 } },
+        right: { 
+          tag: 'seq',
+          left: { 
+            tag: 'par',
+            left: { tag:'note', pitch: 'e4', dur: 80 },
+            right:{ tag:'rest', dur: 30 } },
+          right: { tag:'note', pitch: 'a4', dur: 200 }
+        }
+      }
+    };
+
 
 console.log("MUS:");
 console.log(melody_mus);
 console.log("Compiled:");
-console.log(compile(melody_mus));
+console.log(flatten(compile(melody_mus)));
