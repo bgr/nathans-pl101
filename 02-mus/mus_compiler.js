@@ -1,5 +1,22 @@
 // Lesson 02: MUS language compiler
 
+// get MIDI pitch from note
+var convertPitch = function(p) {
+  var l = p.charAt(0).toLowerCase();
+  var o = parseInt(p.charAt(1));
+  var table = {
+    'c': 0,
+    'd': 2,
+    'e': 4,
+    'f': 5,
+    'g': 7,
+    'a': 9,
+    'b': 11
+  };
+  
+  return 12 + 12 * o + table[l];
+}
+
 // calculate the ending time of the expression given the starting time
 var endTime = function (time, expr) {
     switch(expr.tag) {
@@ -26,7 +43,7 @@ var compileT = function(time, expr) {
         case 'seq':
             return [ compileT(time, expr.left), compileT(endTime(time,expr.left), expr.right) ];
         case 'note':
-            return {tag: 'note', pitch: expr.pitch, start: time, dur: expr.dur };
+            return {tag: 'note', pitch: convertPitch(expr.pitch), start: time, dur: expr.dur };
         case 'rest':
             return {tag: 'rest', start: time, dur: expr.dur };
     }
