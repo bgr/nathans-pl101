@@ -6,8 +6,12 @@ ws = // whitespace
   [ \t\r\n]
 
 expr =
-  r:(atom / exprlist)
+  r:(atom / exprlist / quotedexpr)
     { return r; }
+
+quotedexpr =
+  "'" e:expr
+    { return ['quote',e]; }
   
 spacedexpr =
   ws+ e:expr

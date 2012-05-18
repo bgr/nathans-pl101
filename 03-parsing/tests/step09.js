@@ -17,7 +17,7 @@ var simple = {
   '(a ((b c) d e))': ['a', [ ['b','c'], 'd', 'e'] ], 
   '(a (b c) d e)': ['a', ['b','c'], 'd', 'e'], 
   '(ab cd (ef))': ['ab', 'cd', ['ef']], 
-  '(ab (cd! (+ ef (gh ij)) klmn) (op q (r)))': ['ab', ['cd!', ['+', 'ef', ['gh','ij']], 'klmn'], ['op','q',['r']]] 
+  '(ab (cd! (+ ef (gh ij)) klmn) (op q (r)))': ['ab', ['cd!', ['+', 'ef', ['gh','ij']], 'klmn'], ['op','q',['r']]],
 };
 
 var whitespace = {
@@ -78,11 +78,38 @@ var whitespace = {
   '\t(\ta2!1\t+\t76\t)\t': ['a2!1','+','76'],
   '\t(a   (b\t\tc   ) )': ['a', ['b','c']], 
   '   (   ab cd (ef)\t\t)\t\t': ['ab', 'cd', ['ef']], 
-  '\t(   ab\t(\t\tcd!\t(   +\t \tef   (\t\tgh ij)) klmn)\t (op\tq\t(   r   )\t)  )\t': ['ab', ['cd!', ['+', 'ef', ['gh','ij']], 'klmn'], ['op','q',['r']]]
+  '\t(   ab\t(\t\tcd!\t(   +\t \tef   (\t\tgh ij)) klmn)\t (op\tq\t(   r   )\t)  )\t': ['ab', ['cd!', ['+', 'ef', ['gh','ij']], 'klmn'], ['op','q',['r']]],
   };
   
+var quote = {
+  "'a": ['quote', 'a'],
+  "'abc": ['quote','abc'],
+  "'(x)": ['quote', ['x']],
+  "'(x y)": ['quote', ['x','y']],
+  "(abc 'def)": ['abc', ['quote','def']],
+  "'a2!1": ['quote','a2!1'],
+  "(a2!1 '+ 76)": ['a2!1',['quote','+'],'76'],
+  "'(a '(b c))": ['quote',['a', ['quote',['b','c']]]], 
+  "'(a ('('b 'c) d e))": ['quote',['a', [ ['quote',[['quote','b'],['quote','c']]], 'd', 'e'] ]], 
+};
+
+
+var quoteWhitespace = {
+  "  'a": ['quote', 'a'],
+  "'abc  ": ['quote','abc'],
+  "'(  x  )": ['quote', ['x']],
+  "   '(\tx\t\ty\t)   ": ['quote', ['x','y']],
+  "\t\t(\tabc\t'def\t)\t": ['abc', ['quote','def']],
+  " \t\t 'a2!1 \t  ": ['quote','a2!1'],
+  "   (\ta2!1\t'+\t76\t)": ['a2!1',['quote','+'],'76'],
+  "   '(a\t \t'(b c))": ['quote',['a', ['quote',['b','c']]]], 
+  "\t\t'(a (   '(   'b\t\t'c) d e))": ['quote',['a', [ ['quote',[['quote','b'],['quote','c']]], 'd', 'e'] ]], 
+};
+  
 var fails = ['(', '(x', ')', 'x)', ')(', '(()', '())', ')x(', '(x()', '((x)', '())x',
-'  (', '(  x', '\t )\t', '\t\tx\t\t)', ')   (', '\t(\t(\t\t)', '\t\t())', '   ) x  (', '\t\t\t (  \t x()', '((x)', '   ( \t )\t\t)x', '(abc (  def)', '  \t(  abc (  def g)  ))'];
+'  (', '(  x', '\t )\t', '\t\tx\t\t)', ')   (', '\t(\t(\t\t)', '\t\t())', '   ) x  (', '\t\t\t (  \t x()', '((x)', '   ( \t )\t\t)x', '(abc (  def)', '  \t(  abc (  def g)  ))', "'(", "('x", "')", "x')", ")'(", "(()", "())", ")'x(", "(x()", "((x)", "())x", "  (", "(  x", "\t )\t", "\t\tx\t\t)", ")   (", "\t(\t'(\t\t)", "\t\t())", "   ) x  (", "'\t\t\t (  \t x()", "((x)", "   ( \t )\t\t)'x", "(abc ( ' def)", "  \t(  abc (  'def g)  ))", "' x", "' (a b)", "(' a b)", "(  ' a b)", "'  (a)"];
+
+
 
 var pegData = fs.readFileSync(pegDataPath, 'utf-8');
 var parse = PEG.buildParser(pegData).parse;
@@ -107,6 +134,20 @@ exports.testWhitespace = function(test) {
     test.deepEqual(parse(cr), whitespace[k]);
     test.deepEqual(parse(lf), whitespace[k]);
     test.deepEqual(parse(crlf), whitespace[k]);
+  }
+  test.done();
+}
+
+exports.testQuote = function(test) {
+  for(var k in quote) {
+    test.deepEqual(parse(k), quote[k]);
+  }
+  test.done();
+}
+
+exports.testQuoteWhitespace = function(test) {
+  for(var k in quoteWhitespace) {
+    test.deepEqual(parse(k), quoteWhitespace[k]);
   }
   test.done();
 }
