@@ -1,3 +1,5 @@
+// Scheem language grammar with support for quotes, whitespace and comments
+
 start =
   ws* e:expr ws* comment?
     { return e; }
