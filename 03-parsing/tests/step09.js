@@ -105,9 +105,41 @@ var quoteWhitespace = {
   "   '(a\t \t'(b c))": ['quote',['a', ['quote',['b','c']]]], 
   "\t\t'(a (   '(   'b\t\t'c) d e))": ['quote',['a', [ ['quote',[['quote','b'],['quote','c']]], 'd', 'e'] ]], 
 };
+
+var comments = {
+  'a;; comment': 'a',
+  'a ;;comment': 'a',
+  'a;; comment more words': 'a',
+  'a ;; comment more words': 'a',
+  'a;; comment newline\n': 'a',
+  'a;; comment newline\r': 'a',
+  'a;; comment newline\r\n': 'a',
+  ';; comment before\ra': 'a',
+  ';; comment before\na': 'a',
+  ';; comment before\r\na': 'a',
+  '    ;; comment before\r\na': 'a',
+  '\t\t;; comment before\r\na': 'a',
+  '\t\t;; comment before\r\n   a': 'a',
+  '\t\t;; comment before\r\n\t\ta': 'a',
+  ';;;;;; comment\r\na': 'a',
+  ';; comment before\r\na;;and after': 'a',
+  ';; comment before\r\na;;and after\r': 'a',
+  ';; comment before\r\na;;and after\n': 'a',
+  ';; comment before\r\na;;and after\r\n': 'a',
+  ';; comment before\r\na;;and after\r\r\r': 'a',
+  ';; comment before\r\na;;and after\r\r\r\n': 'a',
+  ';; comment before\r\n\na;;and after\r\n\r\n': 'a',
+  ';; comment before\n\r\na;;and after\r\n\r\r\n': 'a',
+  ';;cmt\rabc': 'abc', 
+  '(x;;cmt\r)': ['x'], 
+  '(x y;;cmt\n)': ['x','y'],
+  '(abc;;cmt\rdef   ;; cmt 2\n);;cmt 3\n;;cmt 4': ['abc','def'],
+  'a2!1;;cmt\r\n;;cmt 2\r\n': 'a2!1',
+  ';; cmt\r\n\r\n;;cmt 2\r\n(;;\r\nab;; asd \r\n (cd! (;;cmt \r  + ef (gh ;;cmt\t2\t\r\tij)) ;;cmt  \r klmn);; comment\n\r (op q (r)));; end cmt': ['ab', ['cd!', ['+', 'ef', ['gh','ij']], 'klmn'], ['op','q',['r']]],
+  ";; c m\r;; c m\n'(;; c m\r\nab  ;;\n\r  ;;\r  '(cd! (;;xx\n   + ef ('gh ;;xx\r\n  ij)) ;;xx\n\r\r\n klmn);;xx\r (;;\n;;\r\nop;;\n\r  ;;\nq ;;\r;;\r\n\r\n(  ;;\n\r;;\r\rR;;\n\r;;\r);;\r;;\r);;\r;;\r);; end cmt": ['quote', ['ab', ['quote', ['cd!', ['+','ef', [['quote', 'gh'], 'ij']], 'klmn' ]], ['op', 'q', ['R']]]]
+};
   
-var fails = ['(', '(x', ')', 'x)', ')(', '(()', '())', ')x(', '(x()', '((x)', '())x',
-'  (', '(  x', '\t )\t', '\t\tx\t\t)', ')   (', '\t(\t(\t\t)', '\t\t())', '   ) x  (', '\t\t\t (  \t x()', '((x)', '   ( \t )\t\t)x', '(abc (  def)', '  \t(  abc (  def g)  ))', "'(", "('x", "')", "x')", ")'(", "(()", "())", ")'x(", "(x()", "((x)", "())x", "  (", "(  x", "\t )\t", "\t\tx\t\t)", ")   (", "\t(\t'(\t\t)", "\t\t())", "   ) x  (", "'\t\t\t (  \t x()", "((x)", "   ( \t )\t\t)'x", "(abc ( ' def)", "  \t(  abc (  'def g)  ))", "' x", "' (a b)", "(' a b)", "(  ' a b)", "'  (a)"];
+var fails = ['a b', '()', '( )', '(   )', 'a (b)', '(a b) c', '(a b) (c)', '(', '(x', ')', 'x)', ')(', '(()', '())', ')x(', '(x()', '((x)', '())x', '  (', '(  x', '\t )\t', '\t\tx\t\t)', ')   (', '\t(\t(\t\t)', '\t\t())', '   ) x  (', '\t\t\t (  \t x()', '((x)', '   ( \t )\t\t)x', '(abc (  def)', '  \t(  abc (  def g)  ))', "'(", "('x", "')", "x')", ")'(", "(()", "())", ")'x(", "(x()", "((x)", "())x", "  (", "(  x", "\t )\t", "\t\tx\t\t)", ")   (", "\t(\t'(\t\t)", "\t\t())", "   ) x  (", "'\t\t\t (  \t x()", "((x)", "   ( \t )\t\t)'x", "(abc ( ' def)", "  \t(  abc (  'def g)  ))", "' x", "' (a b)", "(' a b)", "(  ' a b)", "'  (a)"];
 
 
 
@@ -148,6 +180,13 @@ exports.testQuote = function(test) {
 exports.testQuoteWhitespace = function(test) {
   for(var k in quoteWhitespace) {
     test.deepEqual(parse(k), quoteWhitespace[k]);
+  }
+  test.done();
+}
+
+exports.testComments = function(test) {
+  for(var k in comments) {
+    test.deepEqual(parse(k), comments[k]);
   }
   test.done();
 }

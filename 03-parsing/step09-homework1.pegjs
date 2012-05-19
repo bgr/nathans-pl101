@@ -1,29 +1,34 @@
 start =
-  ws* e:expr ws*
+  ws* e:expr ws* comment?
     { return e; }
-    
+  
 ws = // whitespace
-  [ \t\r\n]
+  ([ \t] / nl) / (comment nl)
+  
+nl = // newline
+  '\r\n' / [\r\n]
+  
+comment =
+  ';;' [^\r\n]*
 
 expr =
-  r:(atom / exprlist / quotedexpr)
-    { return r; }
+  atom / exprlist / quotedexpr
 
 quotedexpr =
   "'" e:expr
     { return ['quote',e]; }
   
-spacedexpr =
+moreexpr =
   ws+ e:expr
     { return e; }
     
 exprlist = 
-	'(' ws* l:expr r:spacedexpr*  ws* ')'
-    { if(r.length > 0) return [l].concat(r); else return [l]; }
+  '('  ws*  l:expr+ r:moreexpr* ws* ')'
+    { if(r.length > 0) return l.concat(r); else return l; }
 
 atom =
   chars:validchar+ 
     { return chars.join(""); }
-        
+
 validchar = 
   [0-9a-zA-Z_?!+\-=@#$%^&*/.]
