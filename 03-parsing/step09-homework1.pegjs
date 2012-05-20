@@ -29,6 +29,13 @@ exprlist =
     { if(r.length > 0) return l.concat(r); else return l; }
 
 atom =
+  number / str
+  
+number =
+  s:[-+]? n:[0-9]+
+    { return parseInt(s + n.join('')); }
+  
+str =
   chars:validchar+ 
     { return chars.join(""); }
 

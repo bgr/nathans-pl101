@@ -26,7 +26,8 @@ var evalScheem = function (expr, env) {
   }
   if (typeof expr === 'string') {
     if(expr === '#t' || expr === '#f') return expr;
-    else return env[expr];
+    if(env[expr] === undefined) throw new Error('attempted to access undefined variable "' + expr + '"');
+    return env[expr];
   }
   // Look at head of list for operation
   switch (expr[0]) {
@@ -91,3 +92,7 @@ var evalScheem = function (expr, env) {
       return evalScheem(expr[expr.length-1], env);
   }
 };
+
+var evalScheemString = function(scheem, env) {
+  return evalScheem(SCHEEM.parse(scheem), env);
+}
