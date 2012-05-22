@@ -30,7 +30,7 @@ var endTime = function (time, expr) {
             return time + endTime(0, expr.left) + endTime(0, expr.right);
         case 'note':
         case 'rest':
-          return time + expr.dur;
+          return parseInt(time) + parseInt(expr.dur);
     }
 };
 
