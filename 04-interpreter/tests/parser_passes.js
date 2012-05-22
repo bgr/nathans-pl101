@@ -25,6 +25,18 @@ suite('parsing Scheem code', function() {
       [1,2,3]
     );
   });
+  test('"less than" operator', function() {
+    assert.deepEqual(
+      SCHEEM.parse('(< 3 4)'),
+      ['<',3,4]
+    );
+  });
+  test('"equals" operator', function() {
+    assert.deepEqual(
+      SCHEEM.parse('(= 3 4)'),
+      ['=',3,4]
+    );
+  });
   
   test('complex parse', function() {
     assert.deepEqual(
@@ -46,7 +58,6 @@ suite('parsing Scheem code', function() {
       ]
     );
   });
-  
 });
 
 suite('parse and interpret', function() {
@@ -62,6 +73,20 @@ suite('parse and interpret', function() {
       5
     );
   });
+  test('"less than" operator', function() {
+    assert.deepEqual(
+      evalScheemString('(< 3 5)',{}),
+      '#t'
+    );
+  });
+  test('nested "less than" operator', function() {
+    assert.deepEqual(
+      evalScheemString('(< (* 4 5) (/ 180 10))',{}),
+      '#f'
+    );
+  });
+  
+  
   test('complex', function() {
     var env = {abc:34, def:56};
     assert.deepEqual(

@@ -228,9 +228,9 @@ suite('operators "=" and "<"', function() {
       '#t'
     );
   });
-  test('3 not < 2', function() {
+  test('(6/2) not < (8/4)', function() {
     assert.deepEqual(
-      evalScheem(['<', 3, 2], {}),
+      evalScheem(['<', ['/',6,2], ['/',8,4]], {}),
       '#f'
     );
   });

@@ -106,6 +106,16 @@ var quoteWhitespace = {
   "\t\t'(a (   '(   'b\t\t'c) d e))": ['quote',['a', [ ['quote',[['quote','b'],['quote','c']]], 'd', 'e'] ]], 
 };
 
+var operators = {
+  "(+ 1 2)": ['+', 1, 2],
+  "(- 1 2)": ['-', 1, 2],
+  "(* 1 2)": ['*', 1, 2],
+  "(/ 1 2)": ['/', 1, 2],
+  "(= 2 4)": ['=', 2, 4],
+  "(< 3 5)": ['<', 3, 5],
+  "( < ( = ( + 2 3) ( - 4 5)) (+ (- 23 ( / 12 2)) ( * (+ 2 3) 4)))": ['<', ['=',['+',2,3],['-',4,5]], ['+', ['-', 23, ['/', 12, 2]], ['*', ['+', 2, 3], 4] ] ],
+};
+
 var comments = {
   'a;; comment': 'a',
   'a ;;comment': 'a',
@@ -187,6 +197,13 @@ exports.testQuoteWhitespace = function(test) {
 exports.testComments = function(test) {
   for(var k in comments) {
     test.deepEqual(parse(k), comments[k]);
+  }
+  test.done();
+}
+
+exports.testOperators = function(test) {
+  for(var k in operators) {
+    test.deepEqual(parse(k), operators[k]);
   }
   test.done();
 }
