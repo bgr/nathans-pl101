@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>Processing.js Note visualization</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="lib/processing-1.3.6.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-1.7.2.min.js"></script>
+    
+    <script type="text/javascript" src="notes.js"></script>
+    
+    <script type="text/javascript">
+      
+      function drawNotes(id, notes) {
+        if(!Array.isArray(notes)) {
+          if(notes.tag == 'note') notes = [notes]; // input is valid but is just one note
+          else throw new Error('invalid input');
+        }
+        var pjs = Processing.getInstanceById(id);
+        
+        // clear existing notes
+        pjs.clear();
+        
+        // send notes to pjs one by one
+        var n;
+        for(var i=0; i<notes.length; i++) {
+          note=notes[i];
+          var pitch,start,end;
+          pitch = (note.tag == 'note') ? parseInt(note.pitch) : -1;
+          start = parseInt(note.start);
+          end = parseInt(note.start) + parseInt(note.dur);
+          pjs.addNote(pitch, start, end);
+        }
+        
+        // draw the sent notes
+        pjs.redrawNotes();
+      }
+      
+      // we cannot use this function directly because processing.js
+      // applet is not yet ready when DOM ready event happens
+      // so we have to keep checking until it reports it's ready
+      var resizeCanvas = function() {
+        var w = $('#notevis-container').width();
+        var h = $('#notevis-container').height(); 
+        // if there's more than one pjs canvas you could find them by class
+        console.log("resize canvas to " + w + " x " + h);
+        var pjs = Processing.getInstanceById('notevis'); // should refactor this out and access it as a child of container div
+        pjs.size(w,h);
+        pjs.redrawNotes();
+      }
+      var rt; // timer variable
+      var tryResize = function() {
+        if(Processing.getInstanceById('notevis')) { 
+          resizeCanvas(); 
+          rt=null;
+        }
+        else rt = setTimeout(tryResize,250);
+      }
+      
+      // perform initial resize on page load
+      $(function() {
+        tryResize();
+      });
+      
+      // on browser window resize
+      $(window).resize(function() {
+        if(rt) return; // resize already pending
+        else rt = setTimeout(tryResize,250);
+      });
+      
+      
+      //////
+      
+      function drawClicked() {
+        drawNotes('notevis', notes); // notes comes from file notes.js
+      }
+      
+    </script>
+  </head>
+
+  <body>
+    <div id='notevis-container' style='width:60%; height:30%'>
+      <canvas id="notevis" data-processing-sources="NoteVis.pde" style="border: 1px solid black;"></canvas>
+    </div>
+    <hr />
+    <input type="button" value="Draw notes" onclick="drawClicked()" />
+  </body>
+</html>
