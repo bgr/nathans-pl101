@@ -1,0 +1,17 @@
+(begin
+  (define x 5)
+  (define yz9 (+ 2 7))
+  (set! x 
+    (if (= 4 (car (cdr ;; = 3, got from (2 3 4) -> (3 4) -> 3
+          (cons (/ 8 4) '(3 4)) )) ;; (2 3 4)
+        )
+      nothing-to-see-here
+      ;; else
+      (begin
+        (set! yz9 (* yz9 11)) ;; yz9 = 99
+        (- yz9 7) ;; return 92
+      ) 
+    )
+  ) ;; set x to 92
+  (* yz9 x) ;; return 99*92=9108
+)

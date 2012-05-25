@@ -1,0 +1,57 @@
+h6 {
+  color: #CCC;
+  padding-bottom: 0.8em;
+  margin-top: -0.3em;
+}
+
+a {
+  border-bottom: 1px dotted;
+}
+
+a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
+
+
+/* push footer to bottom */
+
+html, body {
+  height: 100%;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer {
+  position: relative; /* chrome bug? */
+  height: 31px;
+  padding-top: 9px;
+  margin-top: 0 !important;
+  clear: both;
+  text-align: center;
+}
+
+#push-footer {
+  height: 90px;
+}
+
+.container {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin-bottom: -41px !important;
+}
+
+dl {
+  color: white;
+}
+
+dd {
+  margin-left: 0.7em;
+}
+
+dd:before {
+  content: '- ';
+}

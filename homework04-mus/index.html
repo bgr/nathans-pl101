@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<title>Scheem parser and interpreter</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+		
+    <!-- theme -->
+    <!--[if lt IE 9]><script type='text/javascript' src='../theme/javascript/html5.js'></script><![endif]-->
+		<script src='../theme/javascript/prettify.js'></script>
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeletonbase.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeleton.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/prettify.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/style.css' />
+    
+    <!-- codemirror -->
+    <link rel="stylesheet" href="../codemirror/codemirror.css">
+    <script src="../codemirror/codemirror.js"></script>
+    <script src="../codemirror/scheme.js"></script>
+    
+    <!-- other -->
+    <script src="../js/jquery-1.7.2.min.js"></script>
+    <script src="../js/processing-1.3.6.min.js"></script>
+    
+    <!-- own files -->
+    <link rel="stylesheet" href="../css/bgr.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="mus_parser.js"></script>
+    <script src="mus_compiler.js"></script>
+    <script src="dynamize.js"></script>
+    
+	</head>
+	
+	<body onload='prettyPrint()'>
+		<div class='container'>
+    
+			<header class='sixteen columns'>
+      
+				<div class='nine columns alpha'>
+					<h1>Custom MUS language</h1>
+					<h2>homeworks 02, 03 and 04 - compiling, parsing and interpreting</h2>
+          <p>Compiles my nonsensical music notation into raw notes. In code you'll see me say "it plays" but that's hypothetical, don't expect to actually hear any music playing.</p>
+				</div>
+        
+        <div class='six columns offset-by-one omega'>
+          <h4>Files:</h4>
+					<ul>
+            <li><a href='https://github.com/bgr/nathans-pl101/blob/master/02-mus/mus_compiler.js'>Compiler</a></li>
+            <li><a href='https://github.com/bgr/nathans-pl101/blob/master/03-parsing/step10-homework2.pegjs'>Grammar</a></li>
+            <li><a href='https://github.com/bgr/nathans-pl101/blob/master/03-parsing/tests/step10.js'>Tests (Nodeunit)</a></li>
+            <li><a href='https://github.com/bgr/nathans-pl101/blob/master/NoteVis/'>Note visualization (processing.js)</a></li>
+          </ul>
+				</div>
+        
+			</header>
+			
+			<div class='sixteen columns'>
+				
+				<div class='ten columns alpha'>
+          <h3>Try it out yourself</h3>
+					<form>
+            <textarea id="code" name="code"></textarea>
+          </form>
+          <div id='resultpane'>Give me some code</div>
+          <div id='notevis-container'>
+            <canvas id="notevis" data-processing-sources="NoteVis.pde"></canvas>
+          </div>
+    
+				</div>
+				
+				<div class='six columns omega'>
+          <h4>or try some prepared code:</h4>
+					
+          <span class='codebutton' data-mus='a4.200 _.100 b4.300 ; plays note "a4" with duration of 200 milliseconds\n; pauses for 150ms and then plays "b4" for 300ms'>Notes and comments</span>
+          <span class='codebutton' data-mus='a3.20 (a4.200 b4.300 | c4.200 d4.200 e4.500) g4.100\n; plays a3\n; then sections (a4 b4) and (c4 d4 e4) are played in parallel\n; after which g4 is played'>Playing in parallel</span>
+          <span class='codebutton' data-mus='a4.200 { b3.200 c3.200 }x3 d4.100\n; middle section is repeated 3 times'>Repeating</span>
+          <span class='codebutton' data-mus="a4.200 (\n { b3.200 (c3.200 | d4.100 e4.100) }x3 |\n { f4.20 _.20 }x5 g4.300 )\nd4.100\n; don't make me explain it doesn't even make sense">Nesting</span>
+          
+          <div>
+          <div class='three columns alpha'>
+            <h4>MUS AST</h4>
+            <pre id='muspane' class='output'>Give me some code</pre>
+          </div>
+          <div class='three columns omega'>
+            <h4>Compiled NOTE</h4>
+              <pre id='notepane' class='output'>me too</pre>
+            </code>
+          </div>
+          </div>
+          
+        </div>
+			</div>
+      
+      <div id='push-footer' class='sixteen columns'></div>
+		</div>
+    
+		<footer>
+			<span>go back to <a href='http://bgr.github.com/nathans-pl101'>home</a> &bull; original theme by <a href='http://fublo.github.com/gh-pages-theme/'>Fublo</a></span>
+		</footer>
+		
+	</body>
+</html>
