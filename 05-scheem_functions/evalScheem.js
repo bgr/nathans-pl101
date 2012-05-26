@@ -45,16 +45,18 @@ var update = function(v, newval, env) {
   else throw new InterpreterError('cannot update variable, environment doesn\'t have property "outer" - this shouldn\'t happen, ever');
 }
 
-// bind new variable
+// bind new variable into new environment and return new environment
 var bind = function(v, newval, env) {
-  if(!env.hasOwnProperty('bindings')) {
+  if(!env.hasOwnProperty('bindings')) { // make sure env is properly formatted
     env.bindings = {};
     if(!env.hasOwnProperty('outer')) env.outer = {};
   }
-  if(env.bindings.hasOwnProperty(v)) {
+  var newEnv = { bindings: {}, outer: env }; // create local environment for binding
+  /*if(env.bindings.hasOwnProperty(v)) {
     throw new InterpreterError('cannot bind variable "' + v + '", variable already defined');
-  }
-  env.bindings[v] = newval;
+  }*/
+  newEnv.bindings[v] = newval;
+  return newEnv;
 }
 
 
@@ -94,7 +96,8 @@ var evalScheem = function (expr, env) {
       return 0;
     case 'define':
       requiredParams(expr,2);
-      bind(expr[1], evalScheem(expr[2], env), env);
+      if(env.bindings[expr[1]] !== undefined) throw new InterpreterError('attempted to redefine variable "' + expr[1] + '"');
+      env.bindings[expr[1]] = evalScheem(expr[2], env);
       return 0;
     case 'quote':
       requiredParams(expr,1);
@@ -129,8 +132,8 @@ var evalScheem = function (expr, env) {
       return evalScheem(expr[expr.length-1], env);
     case 'let-one':
       requiredParams(expr, 3);
-      bind(expr[1], evalScheem(expr[2],env), env);
-      return evalScheem(expr[3], env);
+      var newEnv = bind(expr[1], evalScheem(expr[2],env), env);
+      return evalScheem(expr[3], newEnv);
     default:
       throw new InterpreterError('cannot apply function "' + expr[0] + '"');
   }

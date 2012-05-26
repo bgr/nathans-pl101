@@ -114,7 +114,7 @@ suite('update a variable in environment', function() {
 });
 
 
-suite('add new variable binding to environment', function() {
+suite('add new variable binding', function() {
   var top, middle, deepest;
   var resetEnvs = function() {
     top = { bindings: {'x': 19, 'abc': 56}, outer: { } };
@@ -123,41 +123,21 @@ suite('add new variable binding to environment', function() {
   }
   resetEnvs();
 
-  test('bind "y" in top', function() {
+  test('bind "y" to new local environment, old environments don\'t change', function() {
     resetEnvs();
-    bind('y',23,top);
-    assert.deepEqual(top, { bindings: {'x': 19, 'y': 23, 'abc': 56}, outer: { } } );
-    assert.deepEqual(middle, { bindings: {'y': 16}, outer: top });
-    assert.deepEqual(deepest, { bindings: {'x': 2}, outer: middle });
-  });
-  test('bind "abcd" in top', function() {
-    resetEnvs();
-    bind('abcd',78,top);
-    assert.deepEqual(top, { bindings: {'x': 19, 'abcd': 78, 'abc': 56}, outer: { } } );
-    assert.deepEqual(middle, { bindings: {'y': 16}, outer: top });
-    assert.deepEqual(deepest, { bindings: {'x': 2}, outer: middle });
-  });
-  test('bind "x" in middle', function() {
-    resetEnvs();
-    bind('x', 3, middle);
-    assert.deepEqual(top, { bindings: {'x': 19, 'abc': 56}, outer: { } } );
-    assert.deepEqual(middle, { bindings: {'y': 16, 'x': 3}, outer: top });
-    assert.deepEqual(deepest, { bindings: {'x': 2}, outer: middle });
-  });
-  test('bind "abc" in deepest', function() {
-    resetEnvs();
-    bind('abc', 72, deepest);
+    var newEnv = bind('y',23,top);
+    assert.deepEqual(newEnv, { bindings: { 'y': 23 }, outer: top } );
     assert.deepEqual(top, { bindings: {'x': 19, 'abc': 56}, outer: { } } );
     assert.deepEqual(middle, { bindings: {'y': 16}, outer: top });
-    assert.deepEqual(deepest, { bindings: {'x': 2, 'abc': 72}, outer: middle });
+    assert.deepEqual(deepest, { bindings: {'x': 2}, outer: middle });
   });
-  
-  resetEnvs();
-  
-  test('fail a bind, binding already exists', function() {
-    assert.throws(function() { 
-      bind('x', 3, top); }, 
-      InterpreterError);
+  test('bind "abcd" to new local environment, old environments don\'t change', function() {
+    resetEnvs();
+    var newEnv = bind('abcd',23,middle);
+    assert.deepEqual(newEnv, { bindings: { 'abcd': 23 }, outer: middle } );
+    assert.deepEqual(top, { bindings: {'x': 19, 'abc': 56}, outer: { } } );
+    assert.deepEqual(middle, { bindings: {'y': 16}, outer: top });
+    assert.deepEqual(deepest, { bindings: {'x': 2}, outer: middle });
   });
   
 });
