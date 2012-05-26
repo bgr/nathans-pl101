@@ -1,0 +1,38 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  
+  <link rel="stylesheet" href="../../04-interpreter/tests/css/mocha.css" />
+  
+  <script src="../../04-interpreter/tests/js/jquery-1.7.1.min.js"></script>
+  
+  <script src="../../04-interpreter/tests/js/chai.js"></script>
+  
+  <script src="../../04-interpreter/tests/js/mocha.js"></script>
+  
+  <script>mocha.setup('tdd')</script>
+  
+  <script src="../evalScheem.js"></script>
+  <script src="../../04-interpreter/scheem_parser.js"></script>
+  
+  <script src="helpers-lookup_update_bind.js"></script>
+  <script src="functions.js"></script>
+  
+  <!-- run old tests too! make sure somethings not broken -->
+  <script src="interpreter_passes.js"></script>
+  <script src="interpreter_fails.js"></script>
+  <script src="parser_passes.js"></script>
+  <script src="parser_fails.js"></script>
+  
+  
+  <script>
+    $(function(){
+      mocha.run();
+    });
+  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>

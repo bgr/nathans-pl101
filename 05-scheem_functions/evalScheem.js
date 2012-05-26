@@ -4,6 +4,7 @@ function InterpreterError(message) {
 }
 InterpreterError.prototype = Error.prototype;
 
+
 var requiredParams = function(expr,numParams) {
   if(expr.length != numParams+1) throw new InterpreterError('required number of parameters for "' + expr[0] + '" is ' + numParams + ', got ' + (expr.length-1) + "");
 }
@@ -11,6 +12,7 @@ var requiredParams = function(expr,numParams) {
 var minParams = function(expr,numParams) {
   if(expr.length < numParams+1) throw new InterpreterError('minimum number of parameters for "'+ expr[0] + '" is ' + numParams + ', got ' + (expr.length-1) + "");
 }
+
 
 var binaryNumeric = function(arg1, arg2, env, retfun) {
   arg1 = evalScheem(arg1, env);
@@ -20,9 +22,39 @@ var binaryNumeric = function(arg1, arg2, env, retfun) {
   return retfun(arg1,arg2);
 }
 
+
 var isArray = function(obj) {
   if(Array.isArray) return Array.isArray(obj);
   if(Object.prototype.toString.call(obj) === '[object Array]' ) return true; else return false;
+}
+
+// look up a variable in environment
+// environment format is { bindings: { var1: value, var2: value }, outer: envObject }
+var lookup = function(v, env) {
+  if(!env.hasOwnProperty('bindings')) throw new InterpreterError('variable "' + v + '" not found');
+  else if(env.bindings.hasOwnProperty(v)) return env.bindings[v];
+  else if(env.hasOwnProperty('outer')) return lookup(v, env.outer);
+  else throw new InterpreterError('environment doesn\'t have property "outer" - this shouldn\'t happen, ever');
+}
+
+// update existing variable to new value
+var update = function(v, newval, env) {
+  if(!env.hasOwnProperty('bindings')) throw new InterpreterError('cannot update variable "' + v + '", variable not defined');
+  else if(env.bindings.hasOwnProperty(v)) env.bindings[v] = newval;
+  else if(env.hasOwnProperty('outer')) update(v, newval, env.outer);
+  else throw new InterpreterError('cannot update variable, environment doesn\'t have property "outer" - this shouldn\'t happen, ever');
+}
+
+// bind new variable
+var bind = function(v, newval, env) {
+  if(!env.hasOwnProperty('bindings')) {
+    env.bindings = {};
+    if(!env.hasOwnProperty('outer')) env.outer = {};
+  }
+  if(env.bindings.hasOwnProperty(v)) {
+    throw new InterpreterError('cannot bind variable "' + v + '", variable already defined');
+  }
+  env.bindings[v] = newval;
 }
 
 
@@ -34,8 +66,7 @@ var evalScheem = function (expr, env) {
   }
   if (typeof expr === 'string') {
     if(expr === '#t' || expr === '#f') return expr;
-    if(env[expr] === undefined) throw new InterpreterError('attempted to access undefined variable "' + expr + '"');
-    return env[expr];
+    return lookup(expr, env);
   }
   // Look at head of list for operation
   switch (expr[0]) {
@@ -59,13 +90,11 @@ var evalScheem = function (expr, env) {
       return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a<b ? '#t' : '#f'; });
     case 'set!':
       requiredParams(expr,2);
-      if(env[expr[1]] === undefined) throw new InterpreterError('attempted to set undefined variable "' + expr[1] + '"');
-      env[expr[1]] = evalScheem(expr[2], env);
+      update(expr[1], evalScheem(expr[2], env), env);
       return 0;
     case 'define':
       requiredParams(expr,2);
-      if(env[expr[1]] !== undefined) throw new InterpreterError('attempted to redefine variable "' + expr[1] + '"');
-      env[expr[1]] = evalScheem(expr[2], env);
+      bind(expr[1], evalScheem(expr[2], env), env);
       return 0;
     case 'quote':
       requiredParams(expr,1);
@@ -98,6 +127,10 @@ var evalScheem = function (expr, env) {
         evalScheem(expr[i], env);
       }
       return evalScheem(expr[expr.length-1], env);
+    case 'let-one':
+      requiredParams(expr, 3);
+      bind(expr[1], evalScheem(expr[2],env), env);
+      return evalScheem(expr[3], env);
     default:
       throw new InterpreterError('cannot apply function "' + expr[0] + '"');
   }
