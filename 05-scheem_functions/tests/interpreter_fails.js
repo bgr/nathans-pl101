@@ -310,7 +310,7 @@ suite('error checking, parameter inspection', function() {
   });
   test('define an already defined variable', function() {
     assert.throws(function() {
-      evalScheem(['define', 'x', 2], {x: 3});
+      evalScheem(['define', 'x', 2], {bindings:{x: 3}, outer:{}});
     });
   });
   

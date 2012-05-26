@@ -27,7 +27,7 @@ suite('interpreter errors', function() {
   });
   test('redefine variable', function() {
     assert.throws(function() {
-      evalScheemString('(define xx 9)',{xx:8});
+      evalScheemString('(define xx 9)',{bindings:{xx:8}, outer:{}});
     }, InterpreterError);
   });
   test('invalid function', function() {

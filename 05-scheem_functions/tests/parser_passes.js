@@ -69,7 +69,7 @@ suite('parse and interpret', function() {
   });
   test('variable', function() {
     assert.deepEqual(
-      evalScheemString('abc',{abc:5}),
+      evalScheemString('abc',{bindings: {abc:5}, outer: {} }),
       5
     );
   });
@@ -88,13 +88,13 @@ suite('parse and interpret', function() {
   
   
   test('complex', function() {
-    var env = {abc:34, def:56};
+    var env = {bindings: {abc:34, def:56}, outer: {} };
     assert.deepEqual(
       // see scheem_code_snippet.txt for clean version
       evalScheemString("(begin (define x 5) (define yz9 (+ 2 7)) (set! x (if (= 4 (car (cdr ;; = 3, got from (2 3 4) -> (3 4) -> 3 \r (cons (/ 8 4) '(3 4)) )) ;; (2 3 4) \r ) nothing-to-see-here ;; else \r (begin (set! yz9 (* yz9 11)) ;; yz9 = 99 \r (- yz9 7) ;; return 92 \r ) ) ) ;; set x to 92 \r (* yz9 x) ;; return 99*92=9108 \r )",env),
       9108
     );
-    assert.deepEqual(env, {abc:34, def:56, x:92, yz9:99});
+    assert.deepEqual(env, {bindings: {abc:34, def:56, x:92, yz9:99}, outer: {} });
   });
   
 });

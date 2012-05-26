@@ -9,7 +9,7 @@ suite('atoms', function() {
   });
   test('variable', function() {
     assert.deepEqual(
-      evalScheem('abc',{abc:7}),
+      evalScheem('abc',{ bindings: {abc:7} }),
       7
     );
   });
@@ -146,65 +146,65 @@ suite('division and multiplication', function() {
 
 suite('environment', function() {
   test('evaluate number, do not change environment', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     var evald = evalScheem(5, env);
-    assert.deepEqual(env, {a:4, b:2});
+    assert.deepEqual(env, {bindings: {a:4, b:2}, outer: {} });
     assert.deepEqual(evald, 5);
   });
   test('evaluate variable, do not change environment', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     var evald = evalScheem('b', env);
-    assert.deepEqual(env, {a:4, b:2});
+    assert.deepEqual(env, {bindings: {a:4, b:2}, outer: {} });
     assert.deepEqual(evald, 2);
   });
   test('define a variable', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     evalScheem(['define', 'c', 5], env);
-    assert.deepEqual(env, {a:4, b:2, c:5});
+    assert.deepEqual(env, {bindings: {a:4, b:2, c:5}, outer: {} });
   });
   test('set a variable', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     evalScheem(['set!', 'b', 6], env);
-    assert.deepEqual(env, {a:4, b:6});
+    assert.deepEqual(env, {bindings: {a:4, b:6}, outer: {} });
   });
   test('define a variable as evaluated expression', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     evalScheem(['define', 'c', ['+',3,2]], env);
-    assert.deepEqual(env, {a:4, b:2, c:5});
+    assert.deepEqual(env, {bindings: {a:4, b:2, c:5}, outer: {} });
   });
   test('set a variable to evaluated expression', function() {
-    var env = {a:4, b:2};
+    var env = {bindings: {a:4, b:2}, outer: {} };
     evalScheem(['set!', 'b', ['+',3,2]], env);
-    assert.deepEqual(env, {a:4, b:5});
+    assert.deepEqual(env, {bindings: {a:4, b:5}, outer: {} });
   });
 });
 
 suite('begin', function() {
   test('no environment changes', function() {
-    var env = {a:12, b:23};
+    var env = {bindings: {a:12, b:23}, outer: {} };
     assert.deepEqual(
       evalScheem(['begin', 3, 12, 7], env),
       7
     );
-    assert.deepEqual(env, {a:12, b:23});
+    assert.deepEqual(env, {bindings: {a:12, b:23}, outer: {} });
   });
   
   test('no environment changes with evaluating expressions', function() {
-    var env = {a:12, b:23};
+    var env = {bindings: {a:12, b:23}, outer: {} };
     assert.deepEqual(
       evalScheem(['begin', ['+',3,4], 'a', ['-',5,2]], env),
       3
     );
-    assert.deepEqual(env, {a:12, b:23});
+    assert.deepEqual(env, {bindings: {a:12, b:23}, outer: {} });
   });
   
   test('environment changes with set and define', function() {
-    var env = {a:12, b:23};
+    var env = {bindings: {a:12, b:23}, outer: {} };
     assert.deepEqual(
       evalScheem(['begin', 'a', ['define','c','a'], 'c', ['set!','b',['+',7,5]], ['quote', 'ok']], env),
       'ok'
     );
-    assert.deepEqual(env, {a:12, b:12, c:12});
+    assert.deepEqual(env, {bindings: {a:12, b:12, c:12}, outer: {} });
   });
 
 });
@@ -236,13 +236,13 @@ suite('operators "=" and "<"', function() {
   });
   test('expressions with "="', function() {
     assert.deepEqual(
-      evalScheem(['=', ['-',7,5], ['/','a',6]], {a:12}),
+      evalScheem(['=', ['-',7,5], ['/','a',6]], {bindings: {a:12, b:23}, outer: {} }),
       '#t'
     );
   });
   test('expressions with "<"', function() {
     assert.deepEqual(
-      evalScheem(['<', ['-',7,5], ['/','a',6]], {a:12}),
+      evalScheem(['<', ['-',7,5], ['/','a',6]], {bindings: {a:12, b:23}, outer: {} }),
       '#f'
     );
   });
@@ -262,22 +262,22 @@ suite('if', function() {
     );
   });
   test('expressions, if branch', function() {
-    var env = {a:12};
+    var env = {bindings: {a:12}, outer: {} };
     var evald = evalScheem(['if', ['=', ['-',7,5], ['/','a',6]], 
          ['begin', ['define','b',3], ['+',2,3]], 
          ['begin', ['define','c',4], ['+',3,4]]]
       , env);
     assert.deepEqual(evald, 5);
-    assert.deepEqual(env, {a:12, b:3});
+    assert.deepEqual(env, {bindings: {a:12, b:3}, outer: {} });
   });
   test('expressions, else branch', function() {
-    var env = {a:12};
+    var env = {bindings: {a:12}, outer: {} };
     var evald = evalScheem(['if', ['=', ['-',7,5], ['/','a',3]], 
          ['begin', ['define','b',3], ['+',2,3]], 
          ['begin', ['define','c',4], ['+',3,4]]]
       , env);
     assert.deepEqual(evald, 7);
-    assert.deepEqual(env, {a:12, c:4});
+    assert.deepEqual(env, {bindings: {a:12, c:4}, outer: {} });
   });
 });
 
