@@ -52,10 +52,23 @@ var bind = function(v, newval, env) {
     if(!env.hasOwnProperty('outer')) env.outer = {};
   }
   var newEnv = { bindings: {}, outer: env }; // create local environment for binding
-  /*if(env.bindings.hasOwnProperty(v)) {
-    throw new InterpreterError('cannot bind variable "' + v + '", variable already defined');
-  }*/
   newEnv.bindings[v] = newval;
+  return newEnv;
+}
+
+// bind multiple key-value pairs into new environment
+var bindMultiple = function(varPairs, env) {
+  if(!env.hasOwnProperty('bindings')) { // make sure env is properly formatted
+    env.bindings = {};
+    if(!env.hasOwnProperty('outer')) env.outer = {};
+  }
+  var newEnv = { bindings: {}, outer: env }; // create local environment for binding
+  for(var i=0; i<varPairs.length; i++) {
+    var varName = varPairs[i][0];
+    if(newEnv.bindings.hasOwnProperty(varName)) throw new InterpreterError('variable "'+ varName +'"already bound');
+    var varValue = evalScheem(varPairs[i][1], env);
+    newEnv.bindings[varName] = varValue;
+  }
   return newEnv;
 }
 
@@ -134,8 +147,50 @@ var evalScheem = function (expr, env) {
       requiredParams(expr, 3);
       var newEnv = bind(expr[1], evalScheem(expr[2],env), env);
       return evalScheem(expr[3], newEnv);
+    case 'let':
+      requiredParams(expr, 2);
+      // validate vars
+      var pairs = expr[1];
+      for(var k in pairs) {
+        if(!isArray(pairs[k])) throw new InterpreterError('"let" parameters must be lists, got "' + pairs[k] + '"');
+        if(pairs[k].length != 2) throw new InterpreterError('"let" parameters must have two elements, got ' + pairs[k].length + ': ' + pairs[k]);
+      }
+      var newEnv = bindMultiple(pairs, env);
+      return evalScheem(expr[2], newEnv);
+    case 'lambda-one':
+      /*requiredParams(expr, 2);
+      // just declare the variable, value will be defined when function is called for the first time
+      var localEnv = bind(expr[1], null, env);
+      var l1fn = function(_arg) {
+        update(expr[1], _arg, localEnv);
+        return evalScheem(expr[2], localEnv);
+      };
+      return l1fn;*/
+    case 'lambda':
+      requiredParams(expr, 2);
+      // validate params
+      var p, pairs = [], params = expr[1];
+      if(!isArray(params)) params = [params];
+      for(var k in params) {
+        p = params[k];
+        if(typeof p !== 'string' || p === '#t' || p === '#f') throw new InterpreterError('invalid lambda parameter "' + p + '"');
+        pairs.push([p,0]);
+      }
+      var localEnv = bindMultiple(pairs, env);
+      var lfn = function() {
+        if(arguments.length != params.length) throw new InterpreterError('function expects ' + params.length + ' arguments, got ' + arguments.length);
+        for(var i=0; i<arguments.length; i++) {
+          update(params[i], arguments[i], localEnv);
+        }
+        return evalScheem(expr[2], localEnv);
+      };
+      return lfn;
     default:
-      throw new InterpreterError('cannot apply function "' + expr[0] + '"');
+      var fn = evalScheem(expr[0], env);
+      if(typeof fn !== 'function') throw new InterpreterError('"' + fn + '" is not a function');
+      var argvals = [], args = expr.slice(1, expr.length);
+      for(var k in args) argvals.push(evalScheem(args[k], env));
+      return fn.apply(null, argvals);
   }
 };
 

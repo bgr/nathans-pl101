@@ -19,7 +19,7 @@ suite('parser syntax errors', function() {
   test('(more extensive testing was done in parser tests in previous project)', function() {});
 });
 
-suite('interpreter errors', function() {
+suite('interpreter errors after parsing', function() {
   test('undefined variable', function() {
     assert.throws(function() {
       evalScheemString('abc',{});
