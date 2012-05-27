@@ -108,6 +108,9 @@ suite('lambda', function() {
   test('no args', function() {
     assert.deepEqual(evalScheemString('((lambda () 5))', {}), 5);
   });
+  test('no args, evaluated body', function() {
+    assert.deepEqual(evalScheemString('((lambda () (* (- 5 a) 4)))', { bindings: { a:2 } }), 12);
+  });
   test('one arg "a"', function() {
     assert.deepEqual(evalScheemString('((lambda a a) 5)', {}), 5);
   });
