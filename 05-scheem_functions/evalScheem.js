@@ -34,27 +34,52 @@ EvalScheem = (function() {
   }
   
   // helper for functions that take two numbers, returns function with included parameter validation
-  var binaryNumeric = function() {
-    var args = arguments;
-    var func = arguments[0];
+  var binaryNumeric = function(fname, func) {
     return function(a,b) {
-      if(arguments.length !== 2) throw new InterpreterError('function takes two arguments, got ' + arguments.length + "");
-      if(typeof a !== 'number') throw new InterpreterError('first argument must be a number, got ' + typeof a + ' "' + a + '"');
-      if(typeof b !== 'number') throw new InterpreterError('second argument must be a number, got ' + typeof b + ' "' + b + '"');
+      if(arguments.length !== 2) throw new InterpreterError('function "' + fname + '" takes two arguments, got ' + arguments.length + "");
+      if(typeof a !== 'number') throw new InterpreterError('first argument of "' + fname + '" must be a number, got ' + typeof a + ' "' + a + '"');
+      if(typeof b !== 'number') throw new InterpreterError('second argument of "' + fname + '" must be a number, got ' + typeof b + ' "' + b + '"');
       return func(a, b);
     };
   }
   
+  var cons = function() {
+    if(arguments.length !== 2) throw new InterpreterError('function "cons" takes two arguments, got ' + arguments.length + "");
+    var x = arguments[0];
+    var xs = arguments[1];
+    if(!isArray(xs)) throw new InterpreterError('evaluated "cons" argument must be a list, got "' + xs + '"');
+    return [x].concat(xs);
+  }
+  
+  var car = function() {
+    if(arguments.length !== 1) throw new InterpreterError('function "car" takes one argument, got ' + arguments.length + "");
+    var xs = arguments[0];
+    if(!isArray(xs)) throw new InterpreterError('evaluated "car" argument must be a list, got "' + xs + '"');
+    if(xs.length == 0) throw new InterpreterError('cannot "car" on empty list');
+    return xs[0];
+  }
+  
+  var cdr = function() {
+    if(arguments.length !== 1) throw new InterpreterError('function "cdr" takes one argument, got ' + arguments.length + "");
+    var xs = arguments[0];
+    if(!isArray(xs)) throw new InterpreterError('evaluated "cdr" argument must be a list, got "' + xs + '"');
+    if(xs.length == 0) throw new InterpreterError('cannot "cdr" on empty list');
+    return xs.slice(1,xs.length);
+  }
+  
   // predefined environment to be added to every passed environment at the time of execution
   var predefEnvironment = {
-      '+': binaryNumeric(function(a, b) { return a+b; }),
-      '-': binaryNumeric(function(a, b) { return a-b; }),
-      '*': binaryNumeric(function(a, b) { return a*b; }),
-      '/': binaryNumeric(function(a, b) { return a/b; }),
-      '=': binaryNumeric(function(a, b) { return a==b ? '#t' : '#f'; }),
-      '<': binaryNumeric(function(a, b) { return a<b ?  '#t' : '#f'; }),
+      '+': binaryNumeric('+', function(a, b) { return a+b; }),
+      '-': binaryNumeric('-', function(a, b) { return a-b; }),
+      '*': binaryNumeric('*', function(a, b) { return a*b; }),
+      '/': binaryNumeric('/', function(a, b) { return a/b; }),
+      '=': binaryNumeric('=', function(a, b) { return a==b ? '#t' : '#f'; }),
+      '<': binaryNumeric('<', function(a, b) { return a<b ?  '#t' : '#f'; }),
+      'cons': cons,
+      'car': car,
+      'cdr': cdr,
+      'alert': alert,
   };
-  
   
   // look up a variable in environment
   // environment format is { bindings: { var1: value, var2: value }, outer: envObject }
@@ -117,6 +142,8 @@ EvalScheem = (function() {
       if(expr === '#t' || expr === '#f') return expr; // strings can stand for true/false value
       return lookup(expr, env); // or for variable reference
     }
+    if(expr.length == 0) return [];
+    
     // look at head of list for operation
     switch (expr[0]) {
       case 'set!':
@@ -134,23 +161,6 @@ EvalScheem = (function() {
       case 'quote':
         requiredParams(expr,1);
         return expr[1];
-      case 'cons':
-        requiredParams(expr,2);
-        var oldcons = evalScheem(expr[2], env);
-        if(!isArray(oldcons)) throw new InterpreterError('evaluated argument must be a list, got "' + oldcons + '"');
-        return [evalScheem(expr[1], env)].concat(oldcons);
-      case 'car':
-        requiredParams(expr,1);
-        var tmpcar = evalScheem(expr[1], env)
-        if(!isArray(tmpcar)) throw new InterpreterError('evaluated argument must be a list, got "' + tmpcar + '"');
-        if(tmpcar.length==0) throw new InterpreterError('car error - list is empty');
-        return tmpcar[0];
-      case 'cdr':
-        requiredParams(expr,1);
-        var tmpcdr = evalScheem(expr[1], env);
-        if(!isArray(tmpcdr)) throw new InterpreterError('evaluated argument must be a list, got "' + tmpcdr + '"');
-        if(tmpcdr.length==0) throw new InterpreterError('cdr error - list is empty');
-        return tmpcdr.slice(1, tmpcdr.length);
       case 'if':
         requiredParams(expr,3);
         var cond = evalScheem(expr[1], env);
