@@ -1,4 +1,8 @@
 var assert = chai.assert;
+var lookup = EvalScheem.lookup;
+var update = EvalScheem.update;
+var bind = EvalScheem.bind;
+var InterpreterError = EvalScheem.InterpreterError;
 
 suite('lookup a variable in environment', function() {
   var top = { bindings: {'x': 19, 'abc': 56}, outer: { } };

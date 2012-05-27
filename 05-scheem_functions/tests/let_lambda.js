@@ -1,4 +1,6 @@
 var assert = chai.assert;
+var evalScheemString = EvalScheem.parseAndEval;
+var InterpreterError = EvalScheem.InterpreterError;
 
 suite('let-one', function() {
   var top, middle, deepest;

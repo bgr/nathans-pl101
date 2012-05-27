@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var evalScheem = EvalScheem.eval;
 
 suite('atoms', function() {
   test('number', function() {

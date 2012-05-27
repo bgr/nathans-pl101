@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var InterpreterError = EvalScheem.InterpreterError;
 
 suite('parser syntax errors', function() {
   test('extra code', function() {
@@ -25,11 +26,13 @@ suite('interpreter errors after parsing', function() {
       evalScheemString('abc',{});
     }, InterpreterError);
   });
+  /*
+  // now valid
   test('redefine variable', function() {
     assert.throws(function() {
       evalScheemString('(define xx 9)',{bindings:{xx:8}, outer:{}});
     }, InterpreterError);
-  });
+  });*/
   test('invalid function', function() {
     assert.throws(function() {
       evalScheemString('(asd 1 2)',{});

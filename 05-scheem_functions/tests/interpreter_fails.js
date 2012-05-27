@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var evalScheem = EvalScheem.eval;
 
 suite('error checking, wrong number of parameters', function() {
   test('quote no params', function() {
@@ -308,11 +309,12 @@ suite('error checking, parameter inspection', function() {
       evalScheem(['set!', 'x', 2], {});
     });
   });
+  /*
+  // now valid
   test('define an already defined variable', function() {
     assert.throws(function() {
       evalScheem(['define', 'x', 2], {bindings:{x: 3}, outer:{}});
     });
-  });
-  
+  });*/ 
   
 });
