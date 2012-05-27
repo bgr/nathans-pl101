@@ -28,26 +28,41 @@ EvalScheem = (function() {
   }
   
   
-  // helper for functions that take two numbers
-  
-  var binaryNumeric = function(arg1, arg2, env, retfun) {
-    arg1 = evalScheem(arg1, env);
-    if(typeof arg1 !== 'number') throw new InterpreterError('first argument must be a number');
-    arg2 = evalScheem(arg2, env);
-    if(typeof arg2 !== 'number') throw new InterpreterError('second argument must be a number');
-    return retfun(arg1,arg2);
-  }
-
-  
   var isArray = function(obj) {
     if(Array.isArray) return Array.isArray(obj);
     if(Object.prototype.toString.call(obj) === '[object Array]' ) return true; else return false;
   }
   
+  // helper for functions that take two numbers, returns function with included parameter validation
+  var binaryNumeric = function() {
+    var args = arguments;
+    var func = arguments[0];
+    return function(a,b) {
+      if(arguments.length !== 2) throw new InterpreterError('function takes two arguments, got ' + arguments.length + "");
+      if(typeof a !== 'number') throw new InterpreterError('first argument must be a number, got ' + typeof a + ' "' + a + '"');
+      if(typeof b !== 'number') throw new InterpreterError('second argument must be a number, got ' + typeof b + ' "' + b + '"');
+      return func(a, b);
+    };
+  }
+  
+  // predefined environment to be added to every passed environment at the time of execution
+  var predefEnvironment = {
+      '+': binaryNumeric(function(a, b) { return a+b; }),
+      '-': binaryNumeric(function(a, b) { return a-b; }),
+      '*': binaryNumeric(function(a, b) { return a*b; }),
+      '/': binaryNumeric(function(a, b) { return a/b; }),
+      '=': binaryNumeric(function(a, b) { return a==b ? '#t' : '#f'; }),
+      '<': binaryNumeric(function(a, b) { return a<b ?  '#t' : '#f'; }),
+  };
+  
+  
   // look up a variable in environment
   // environment format is { bindings: { var1: value, var2: value }, outer: envObject }
   var lookup = function(v, env) {
-    if(!env.hasOwnProperty('bindings')) throw new InterpreterError('variable "' + v + '" not found');
+    if(!env.hasOwnProperty('bindings')) {
+      if(predefEnvironment.hasOwnProperty(v)) return predefEnvironment[v];
+      else throw new InterpreterError('variable "' + v + '" not found');
+    }
     else if(env.bindings.hasOwnProperty(v)) return env.bindings[v];
     else if(env.hasOwnProperty('outer')) return lookup(v, env.outer);
     else throw new InterpreterError('environment doesn\'t have property "outer" - this shouldn\'t happen, ever');
@@ -89,49 +104,31 @@ EvalScheem = (function() {
   }
   
   
-  var getInitialEnvironment = function() {
-    return { bindings: {}, outer: {} };
-  }
-  
-  // main interpreter function
-  
+  ///////////////////////////////////
+  //                               //
+  //   main interpreter function   //
+  //                               //
+  ///////////////////////////////////
   var evalScheem = function (expr, env) {
-    // Numbers evaluate to themselves
-    if (typeof expr === 'number') {
+    if (typeof expr === 'number') { // numbers evaluate to themselves
       return expr;
     }
     if (typeof expr === 'string') {
-      if(expr === '#t' || expr === '#f') return expr;
-      return lookup(expr, env);
+      if(expr === '#t' || expr === '#f') return expr; // strings can stand for true/false value
+      return lookup(expr, env); // or for variable reference
     }
-    // Look at head of list for operation
+    // look at head of list for operation
     switch (expr[0]) {
-      case '+':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a+b; });
-      case '-':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a-b; });
-      case '*':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a*b; });
-      case '/':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a/b; });
-      case '=':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a===b ? '#t' : '#f'; });
-      case '<':
-        requiredParams(expr,2);
-        return binaryNumeric(expr[1], expr[2], env, function(a,b) { return a<b ? '#t' : '#f'; });
       case 'set!':
         requiredParams(expr,2);
         update(expr[1], evalScheem(expr[2], env), env);
         return 0;
       case 'define':
         requiredParams(expr,2);
-        //if(env.bindings[expr[1]] !== undefined) throw new InterpreterError('attempted to redefine variable "' + expr[1] + '"');
-        // redefining existing variable is now allowed
+        if(!env.hasOwnProperty('bindings')) { // make sure env is properly formatted
+          env.bindings = {};
+          if(!env.hasOwnProperty('outer')) env.outer = {};
+        }
         env.bindings[expr[1]] = evalScheem(expr[2], env);
         return 0;
       case 'quote':
@@ -208,10 +205,10 @@ EvalScheem = (function() {
     }
   };
   
+  // parse raw scheem code
   var parseAndEval = function(scheem, env) {
     return evalScheem(SCHEEM.parse(scheem), env);
   }
-  
   
   var result = {};
   // export for testing
@@ -221,7 +218,6 @@ EvalScheem = (function() {
   // export for use
   result.eval = evalScheem;
   result.parseAndEval = parseAndEval;
-  result.getInitialEnvironment = getInitialEnvironment;
   result.InterpreterError = InterpreterError;
   return result;
 })();

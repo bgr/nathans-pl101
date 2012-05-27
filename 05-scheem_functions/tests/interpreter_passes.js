@@ -158,6 +158,11 @@ suite('environment', function() {
     assert.deepEqual(env, {bindings: {a:4, b:2}, outer: {} });
     assert.deepEqual(evald, 2);
   });
+  test('define a variable with {} environment', function() {
+    var env = {};
+    evalScheem(['define', 'c', 5], env);
+    assert.deepEqual(env, {bindings: { c:5 }, outer: {} });
+  });
   test('define a variable', function() {
     var env = {bindings: {a:4, b:2}, outer: {} };
     evalScheem(['define', 'c', 5], env);

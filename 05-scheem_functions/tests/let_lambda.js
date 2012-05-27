@@ -70,7 +70,7 @@ suite('let', function() {
     assert.deepEqual(evalScheemString('(let ((abc 5) (d 6)) (+ d abc))', {}), 11);
   });
   test('expressions evaluate as args', function() {
-    assert.deepEqual(evalScheemString('(let ((abc (+ 5 x)) (d (* 2 x))) (+ (* 3 d) abc))', {bindings: {x: 3}}), 26);
+    assert.deepEqual(evalScheemString('(let ((abc (+ 5 x)) (d (* 2 x))) (+ (* 3 d) abc))', {bindings: {x: 3}, outer: {}}), 26);
   });
   
   test('fail, params not in pairs', function() {
@@ -111,7 +111,7 @@ suite('lambda', function() {
     assert.deepEqual(evalScheemString('((lambda () 5))', {}), 5);
   });
   test('no args, evaluated body', function() {
-    assert.deepEqual(evalScheemString('((lambda () (* (- 5 a) 4)))', { bindings: { a:2 } }), 12);
+    assert.deepEqual(evalScheemString('((lambda () (* (- 5 a) 4)))', { bindings: { a:2 }, outer: {} }), 12);
   });
   test('one arg "a"', function() {
     assert.deepEqual(evalScheemString('((lambda a a) 5)', {}), 5);
