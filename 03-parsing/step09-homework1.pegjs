@@ -25,8 +25,8 @@ moreexpr =
     { return e; }
     
 exprlist = 
-  '('  ws*  l:expr+ r:moreexpr* ws* ')'
-    { if(r.length > 0) return l.concat(r); else return l; }
+  ( '(' ws* ')' ) {return []; }  / 
+  ( '('  ws*  l:expr+ r:moreexpr* ws* ')' )  { if(r.length > 0) return l.concat(r); else return l; }
 
 atom =
   number / str

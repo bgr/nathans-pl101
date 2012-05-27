@@ -375,42 +375,95 @@ SCHEEM = (function(){
             result2 = parse_ws();
           }
           if (result1 !== null) {
-            result3 = parse_expr();
-            if (result3 !== null) {
-              result2 = [];
-              while (result3 !== null) {
-                result2.push(result3);
-                result3 = parse_expr();
-              }
+            if (input.charCodeAt(pos) === 41) {
+              result2 = ")";
+              pos++;
             } else {
               result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\")\"");
+              }
             }
             if (result2 !== null) {
-              result3 = [];
-              result4 = parse_moreexpr();
-              while (result4 !== null) {
-                result3.push(result4);
-                result4 = parse_moreexpr();
-              }
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset) {return []; })(pos0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          if (input.charCodeAt(pos) === 40) {
+            result0 = "(";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"(\"");
+            }
+          }
+          if (result0 !== null) {
+            result1 = [];
+            result2 = parse_ws();
+            while (result2 !== null) {
+              result1.push(result2);
+              result2 = parse_ws();
+            }
+            if (result1 !== null) {
+              result3 = parse_expr();
               if (result3 !== null) {
-                result4 = [];
-                result5 = parse_ws();
-                while (result5 !== null) {
-                  result4.push(result5);
-                  result5 = parse_ws();
+                result2 = [];
+                while (result3 !== null) {
+                  result2.push(result3);
+                  result3 = parse_expr();
                 }
-                if (result4 !== null) {
-                  if (input.charCodeAt(pos) === 41) {
-                    result5 = ")";
-                    pos++;
-                  } else {
-                    result5 = null;
-                    if (reportFailures === 0) {
-                      matchFailed("\")\"");
-                    }
+              } else {
+                result2 = null;
+              }
+              if (result2 !== null) {
+                result3 = [];
+                result4 = parse_moreexpr();
+                while (result4 !== null) {
+                  result3.push(result4);
+                  result4 = parse_moreexpr();
+                }
+                if (result3 !== null) {
+                  result4 = [];
+                  result5 = parse_ws();
+                  while (result5 !== null) {
+                    result4.push(result5);
+                    result5 = parse_ws();
                   }
-                  if (result5 !== null) {
-                    result0 = [result0, result1, result2, result3, result4, result5];
+                  if (result4 !== null) {
+                    if (input.charCodeAt(pos) === 41) {
+                      result5 = ")";
+                      pos++;
+                    } else {
+                      result5 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("\")\"");
+                      }
+                    }
+                    if (result5 !== null) {
+                      result0 = [result0, result1, result2, result3, result4, result5];
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
                   } else {
                     result0 = null;
                     pos = pos1;
@@ -431,15 +484,12 @@ SCHEEM = (function(){
             result0 = null;
             pos = pos1;
           }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, l, r) { if(r.length > 0) return l.concat(r); else return l; })(pos0, result0[2], result0[3]);
-        }
-        if (result0 === null) {
-          pos = pos0;
+          if (result0 !== null) {
+            result0 = (function(offset, l, r) { if(r.length > 0) return l.concat(r); else return l; })(pos0, result0[2], result0[3]);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
         }
         return result0;
       }
