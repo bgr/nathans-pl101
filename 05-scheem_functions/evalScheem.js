@@ -197,8 +197,8 @@ EvalScheem = (function() {
           if(typeof p !== 'string' || p === '#t' || p === '#f') throw new InterpreterError('invalid lambda parameter "' + p + '"');
           pairs.push([p,0]);
         }
-        var localEnv = bindMultiple(pairs, env);
         var lfn = function() {
+          var localEnv = bindMultiple(pairs, env);
           if(arguments.length != params.length) throw new InterpreterError('function expects ' + params.length + ' arguments, got ' + arguments.length);
           for(var i=0; i<arguments.length; i++) {
             update(params[i], arguments[i], localEnv);
