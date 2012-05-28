@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<title>Scheem parser and interpreter</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+		
+    <!-- theme -->
+    <!--[if lt IE 9]><script type='text/javascript' src='../theme/javascript/html5.js'></script><![endif]-->
+		<script src='../theme/javascript/prettify.js'></script>
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeletonbase.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeleton.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/prettify.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/style.css' />
+    
+    <!-- codemirror -->
+    <link rel="stylesheet" href="../codemirror/codemirror.css">
+    <script src="../codemirror/codemirror.js"></script>
+    <script src="../codemirror/scheme.js"></script>
+    
+    <!-- jquery -->
+    <script src="../js/jquery-1.7.2.min.js"></script>
+    
+    <!-- own files -->
+    <link rel="stylesheet" href="../css/bgr.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="scheem_parser.js"></script>
+    <script src="evalScheem.js"></script>
+    <script src="dynamize.js"></script>
+    
+	</head>
+	
+	<body onload='prettyPrint()'>
+		<div class='container'>
+    
+			<header class='sixteen columns'>
+      
+				<div class='nine columns alpha'>
+					<h1>Scheem</h1>
+					<h2>homework 05 - functions</h2>
+          <p>Scheem is a bare bones version of Scheme programming language. The version featured on this page adds support for defining and calling functions with <i>lambda</i>, along with support for local variables with <i>let</i>. Examples showing new functionality are colored greenish.</p>
+				</div>
+        
+        <div class='six columns offset-by-one omega'>
+					<h4>Files:</h4>
+          <dl>
+            <dt>Scheem grammar</dt>
+              <dd><a href='https://github.com/bgr/nathans-pl101/blob/master/03-parsing/step09-homework1.pegjs'>PEG.js parser definition</a></dd>
+              <dd><a href='https://github.com/bgr/nathans-pl101/blob/master/03-parsing/tests/step09.js'>Parser tests (Nodeunit)</a></dd>
+            <dt>Scheem interpreter</dt>
+              <dd><a href='https://github.com/bgr/nathans-pl101/blob/master/05-scheem_functions/evalScheem.js'>Source code</a></dd>
+              <dd>Interpreter and parser tests (Mocha+Chai) - <a href='https://github.com/bgr/nathans-pl101/tree/master/05-scheem_functions/tests'>see code</a> or <a href='tests/run_tests.html'>run in browser</a></dd>
+          </dl>
+				</div>
+        
+			</header>
+			
+			<div class='sixteen columns'>
+				
+				<div class='ten columns alpha'>
+          <h3>Try it out yourself</h3>
+					<form>
+            <textarea id="code" name="code"></textarea>
+          </form>
+					
+          <h4>Result</h4>
+					<div id='resultpane'>Give me some code</div>
+          
+          <!-- environment isn't useful anymore
+          <h4>Environment</h4>
+            <pre id='environment'>enter some code into the editor</pre>
+          </code>
+          -->
+          
+				</div>
+				
+				<div class='six columns omega'>
+          <h4>or try some prepared code:</h4>
+					
+          <span class='codebutton old' data-scheem=';; hello, this is comment\n;; multiline comments are not supported though\n \n;;and there has to be some real code to get rid of that error below\n;;try another example'>Comments</span>
+          <span class='codebutton old' data-scheem='12'>Number</span>
+          <span class='codebutton old' data-scheem='(+ 4 3)\n;; check out the Result panel below'>Addition</span>
+          <span class='codebutton old' data-scheem='(+ 3 (- 7 2))'>Nesting</span>
+          <span class='codebutton old' data-scheem='(define x 3)\n;; check out the Environment panel below'>Define variable</span>
+          <span class='codebutton old' data-scheem='(begin \n  (define x 3)\n  (define y 4)\n  (* x y)\n)'>Multiple expressions</span>
+          <span class='codebutton old' data-scheem='(begin (define x 3) (set! x (+ x 2)) x)'>Update existing variable</span>
+          <span class='codebutton old' data-scheem='(= 3 3)'>Equality check</span>
+          <span class='codebutton old' data-scheem='(< 4 3)'>Less-than check</span>
+          <span class='codebutton old' data-scheem="(if #t 1 2)">if-else true</span>
+          <span class='codebutton old' data-scheem="(if #f 1 2)">if-else false</span>
+          <span class='codebutton old' data-scheem="(if (< 4 3)\n  (+ 2 3) ;; this would be evaluated if the condition were true\n  (+ 4 5) ;; this is evaluated since it's false\n)">if-else</span>
+          <span class='codebutton old' data-scheem="'(3 4)">Quote a list</span>
+          <span class='codebutton old' data-scheem="(cons 2 '(3 4))">Append to list</span>
+          <span class='codebutton old' data-scheem="(car '(2 3 4))">Get head of list</span>
+          <span class='codebutton old' data-scheem="(cdr '(2 3 4))">Get tail of list</span>
+          
+          <span class='codebutton' data-scheem="((lambda (a b) (+ a b)) 3 4)">Lambda with 2 params</span>
+          <span class='codebutton' data-scheem="( (lambda () (+ 7 9)) )">Lambda with no params</span>
+          <span class='codebutton' data-scheem="(let ((a 3) \n      (b 4))\n  (+ a b))">Local variables</span>
+          <span class='codebutton' data-scheem="(let ((x 2) (y 3))\n  (let ((x 7)\n        (z (+ x y))) ;; z=2+3, x is not yet bound\n    (* z x))) ;; = 5*7">Local variables shadowing external</span>
+          <span class='codebutton' data-scheem="(begin\n  (define fact \n    (lambda (n) (begin\n       (if (< n 2)\n         1\n         (* n (fact (- n 1)))\n       ))))\n\n  (fact 5)\n)">Factorial</span>
+          <span class='codebutton' data-scheem="(begin\n  (define x 5)\n  (define times3 (lambda (x) (* x 3)))\n  (times3 (+ x 1))\n)">Function argument shadowing global</span>
+          <span class='codebutton' data-scheem="(begin\n  (define z 2) ;; this value makes no difference\n  (define gen (lambda (x) \n      (lambda (y) (- x (* y z)))))\n  (set! z 3) ;; also makes no difference\n  (define fn (gen 17)) ;; fn = (lambda (y) (- 17 (* y z)))\n  (set! z 4) ;; this value will be taken\n  (fn 3) ;; (- 17 (* 3 4))\n)">Nested lambdas</span>
+          <span class='codebutton' data-scheem="(begin\n  (define z 2)\n  ((lambda () (set! z 3)))\n  z\n)">Function modifies global variable</span>
+          <span class='codebutton' data-scheem="(begin\n  (define times3 (lambda (x) (* x 3)))\n  (define gimme (lambda (val func) (func val)))\n  (gimme 2 times3)\n)">Pass function as value</span>
+          <span class='codebutton' data-scheem="(begin\n  (define gimme (lambda (x y func) (func x y)))\n  (gimme 2 3 +)\n)">Pass predefined function</span>
+          <span class='codebutton' data-scheem="((if #f - +) 2 3)">Evaluate to a function</span>
+          <span class='codebutton' data-scheem="(if #t () (alert 'hello-world)) ;; change #t to #f">Annoyability</span>
+          
+				</div>
+			</div>
+      
+      <div id='push-footer' class='sixteen columns'></div>
+		</div>
+    
+		<footer>
+			<span>go back to <a href='http://bgr.github.com/nathans-pl101'>home</a> &bull; original theme by <a href='http://fublo.github.com/gh-pages-theme/'>Fublo</a></span>
+		</footer>
+		
+	</body>
+</html>

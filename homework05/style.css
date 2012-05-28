@@ -1,0 +1,46 @@
+.codebutton {
+  background-color: #787C54;
+  margin: 3px 1px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  display: inline-block;
+  box-shadow: 0px 0px 6px black;
+  border: 1px solid rgb(152, 156, 102);
+  color: rgb(241, 234, 205);
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.old { /* different button background color for old examples */
+  background-color: #8D8B86 !important;
+  border-color: rgb(162, 162, 162) !important; 
+  color: rgb(230, 230, 230) !important;
+}
+
+
+#resultpane {
+  background-color: #ccc;
+  font-family: monospace;
+  padding: 2px 5px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.parser-ok {
+  background-color: #B4F3B4 !important;
+}
+
+.parser-error {
+  background-color: #D5A9A9 !important;
+}
+
+#environment {
+  background-color: #4E4E4E;
+  font-family: monospace;
+  padding: 2px 5px;
+  font-size: 0.8em;
+  line-height: 1.3em;
+  color: white;
+  max-height: 300px;
+  overflow: auto;
+}
