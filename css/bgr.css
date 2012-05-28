@@ -13,6 +13,14 @@ a:hover {
   border-bottom: 1px solid;
 }
 
+b {
+  font-weight: bold;
+}
+
+i {
+  font-style: italic;
+}
+
 
 /* push footer to bottom */
 
