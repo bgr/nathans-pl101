@@ -97,7 +97,8 @@
           <span class='codebutton' data-scheem="( (lambda () (+ 7 9)) )">Lambda with no params</span>
           <span class='codebutton' data-scheem="(let ((a 3) \n      (b 4))\n  (+ a b))">Local variables</span>
           <span class='codebutton' data-scheem="(let ((x 2) (y 3))\n  (let ((x 7)\n        (z (+ x y))) ;; z=2+3, x is not yet bound\n    (* z x))) ;; = 5*7">Local variables shadowing external</span>
-          <span class='codebutton' data-scheem="(begin\n  (define fact \n    (lambda (n) (begin\n       (if (< n 2)\n         1\n         (* n (fact (- n 1)))\n       ))))\n\n  (fact 5)\n)">Factorial</span>
+          <span class='codebutton' data-scheem="(begin\n  (define fact \n    (lambda (n) (begin\n      (if (< n 2)\n        1\n        (* n (fact (- n 1)))\n       ))))\n\n  (fact 5)\n)">Factorial</span>
+          <span class='codebutton' data-scheem="(begin\n  (define fib\n    (lambda (x)\n      (if (< x 2)\n        x\n        (+ (fib (- x 1)) \n           (fib (- x 2)))\n      )\n    )\n  )\n  (fib 11)\n)">Fibonacci</span>
           <span class='codebutton' data-scheem="(begin\n  (define x 5)\n  (define times3 (lambda (x) (* x 3)))\n  (times3 (+ x 1))\n)">Function argument shadowing global</span>
           <span class='codebutton' data-scheem="(begin\n  (define z 2) ;; this value makes no difference\n  (define gen (lambda (x) \n      (lambda (y) (- x (* y z)))))\n  (set! z 3) ;; also makes no difference\n  (define fn (gen 17)) ;; fn = (lambda (y) (- 17 (* y z)))\n  (set! z 4) ;; this value will be taken\n  (fn 3) ;; (- 17 (* 3 4))\n)">Nested lambdas</span>
           <span class='codebutton' data-scheem="(begin\n  (define z 2)\n  ((lambda () (set! z 3)))\n  z\n)">Function modifies global variable</span>

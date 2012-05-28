@@ -131,6 +131,12 @@ suite('lambda', function() {
   test('three args, evaluated body', function() {
     assert.deepEqual(evalScheemString('((lambda (a bcd ef) (+ bcd (* a ef))) 5 4 3)', {}), 19);
   });
+  test('factorial', function() {
+    assert.deepEqual(evalScheemString('(begin (define fact (lambda (n) (begin (if (< n 2) 1 (* n (fact (- n 1))) )))) (fact 5))', {}), 120);
+  });
+  test('fibonacci', function() {
+    assert.deepEqual(evalScheemString('(begin (define fib (lambda (x) (if (< x 2) x (+ (fib (- x 1)) (fib (- x 2))) ) ) ) (fib 11))', {}), 89);
+  });
   
   test('fail, no body', function() {
     assert.throws(function() {
