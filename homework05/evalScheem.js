@@ -43,11 +43,13 @@ EvalScheem = (function() {
     };
   }
   
+  // standard procedures
+  
   var cons = function() {
     if(arguments.length !== 2) throw new InterpreterError('function "cons" takes two arguments, got ' + arguments.length + "");
     var x = arguments[0];
     var xs = arguments[1];
-    if(!isArray(xs)) throw new InterpreterError('evaluated "cons" argument must be a list, got "' + xs + '"');
+    //if(!isArray(xs)) throw new InterpreterError('evaluated "cons" argument must be a list, got "' + xs + '"');
     return [x].concat(xs);
   }
   
@@ -67,6 +69,26 @@ EvalScheem = (function() {
     return xs.slice(1,xs.length);
   }
   
+  var isList = function() {
+    if(arguments.length !== 1) throw new InterpreterError('function "list?" takes one argument, got ' + arguments.length + "");
+    var l = arguments[0];
+    return isArray(l) ? '#t' : '#f';
+  }
+  
+  var listLength = function() {
+    if(arguments.length !== 1) throw new InterpreterError('function "length" takes one argument, got ' + arguments.length + "");
+    var l = arguments[0];
+    if(!isArray(l)) throw new InterpreterError('argument of "length" must be a list, got ' + typeof l + ': ' + l);
+    return l.length;
+  }
+  
+  var isNull = function() {
+    if(arguments.length !== 1) throw new InterpreterError('function "null?" takes one argument, got ' + arguments.length + "");
+    var l = arguments[0];
+    if(!isArray(l)) return '#f';
+    return l.length == 0 ? '#t' : '#f' ;
+  }
+  
   // predefined environment to be added to every passed environment at the time of execution
   var predefEnvironment = {
       '+': binaryNumeric('+', function(a, b) { return a+b; }),
@@ -79,6 +101,9 @@ EvalScheem = (function() {
       'car': car,
       'cdr': cdr,
       'alert': alert,
+      'length': listLength,
+      'null?': isNull,
+      'list?': isList,
   };
   
   // look up a variable in environment

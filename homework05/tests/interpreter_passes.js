@@ -294,6 +294,30 @@ suite('cons, car, cdr', function() {
       [1,2,3]
     );
   });
+  test('cons two numbers', function() {
+    assert.deepEqual(
+      evalScheem(['cons', 1, 2], {}),
+      [1,2]
+    );
+  });
+  test('cons two numbers, quoted first', function() {
+    assert.deepEqual(
+      evalScheem(['cons', ['quote',1], 2], {}),
+      [1,2]
+    );
+  });
+  test('cons two numbers, quoted first', function() {
+    assert.deepEqual(
+      evalScheem(['cons', ['quote',1], ['quote',2]], {}),
+      [1,2]
+    );
+  });
+  test('cons two numbers, quoted both', function() {
+    assert.deepEqual(
+      evalScheem(['cons', ['quote',1], ['quote',2]], {}),
+      [1,2]
+    );
+  });
   test('cons', function() {
     assert.deepEqual(
       evalScheem(['cons', ['quote', [1, 2]], ['quote', [3, 4]]] , {}),

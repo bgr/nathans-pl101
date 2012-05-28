@@ -277,11 +277,6 @@ suite('error checking, parameter inspection', function() {
     });
   });
   
-  test('cons with non-list', function() {
-    assert.throws(function() {
-      evalScheem(['cons', ['quote',1], ['quote', 2]], {});
-    });
-  });
   test('car with non-list', function() {
     assert.throws(function() {
       evalScheem(['car', ['quote',1]], {});

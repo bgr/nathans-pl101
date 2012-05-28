@@ -107,6 +107,10 @@
           <span class='codebutton' data-scheem="(begin\n  (define gimme (lambda (x y func) (func x y)))\n  (gimme 2 3 +)\n)">Pass predefined function</span>
           <span class='codebutton' data-scheem="((if #f - +) 2 3)">Evaluate to a function</span>
           <span class='codebutton' data-scheem="(if #t () (alert 'hello-world)) ;; change #t to #f">Annoyability</span>
+          <span class='codebutton' data-scheem="(begin\n  (define map \n    (lambda (fn ls) \n      (if (null? ls)\n        ()\n        (cons (fn (car ls)) (map fn (cdr ls)))\n      )))\n\n  (define squareIt (lambda (x) (* x x)))\n  (map squareIt '(1 2 3 4 5))\n)">Map</span>
+          <span class='codebutton' data-scheem="(begin\n  (define foldl (lambda (fn ac ls)\n    (if (null? ls)\n      ac\n      (foldl fn (fn ac (car ls)) (cdr ls))\n    )))\n\n  (foldl + 0 '(1 2 3 4 5))\n)">Foldl</span>
+          <span class='codebutton' data-scheem="(begin\n  (define foldl (lambda (fn ac ls)\n    (if (null? ls)\n      ac\n      (foldl fn (fn ac (car ls)) (cdr ls))\n    )))\n\n  (define flip (lambda (a b) (cons b a)))\n  (foldl flip () '(42 23 16 15 8 4) )\n)">Reverse a list with foldl</span>
+          <span class='codebutton' data-scheem="(begin\n  (define foldr (lambda (fn ac ls)\n    (if (null? ls)\n      ac\n      (fn (car ls) (foldr fn ac (cdr ls)))\n    )))\n\n  (define flatten (lambda (a b)\n    (if (list? a)\n      (if (null? a)\n        b  ;; a is (), just return b\n        (foldr flatten b a)) ;; a is list, flatten and accumulate in b\n    (cons a b)) ;; a is an atom\n  ))\n  \n  (foldr flatten () '((1) (2 3) 4 (((5) 6) (7)) ((8))))\n)">Flatten a list with foldr</span>
           
 				</div>
 			</div>
