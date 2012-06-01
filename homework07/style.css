@@ -1,0 +1,33 @@
+.canvasDrawing {
+  background-color: black;
+  color: lime;
+  font-family: monospace;
+  padding: 2px 5px;
+  width: 100%;
+  overflow: visible;
+  min-height:200px;
+}
+
+.canvasDrawing:focus {
+  color: lime;
+}
+
+input[type="button"] {
+  background-color: #C4C2BB;
+}
+
+input[type="button"]:hover {
+  background-color: #D8D7D4;
+}
+
+label, legend {
+  color: #ccc;
+  font-style: italic;
+  font-weight: normal;
+  font-size: 1em;
+}
+
+input[type="text"] {
+  background-color: #FFFFF2;
+  width: 40px;
+}

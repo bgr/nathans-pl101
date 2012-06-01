@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<title>Scheem parser and interpreter</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <meta http-equiv="expires" content="0" />
+		
+    <!-- theme -->
+    <!--[if lt IE 9]><script type='text/javascript' src='../theme/javascript/html5.js'></script><![endif]-->
+		<script src='../theme/javascript/prettify.js'></script>
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeletonbase.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/skeleton.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/prettify.css' />
+		<link rel='stylesheet' type='text/css' href='../theme/css/style.css' />
+        
+    <!-- jquery -->
+    <script src="../js/jquery-1.7.2.min.js"></script>
+    
+    <!-- own files -->
+    <link rel="stylesheet" href="../css/bgr.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="hanoi.js"></script>
+    <script src="dynamize.js"></script>
+    
+	</head>
+	
+	<body onload='prettyPrint()'>
+		<div class='container'>
+    
+			<header class='sixteen columns'>
+      
+				<div class='nine columns alpha'>
+					<h1>Continuation passing</h1>
+					<h2>homework 07 - continuation passing part 1</h2>
+          <p>Conversion of a recursive function into continuation passing style. For this homework I chose a recursive function that solves Towers of Hanoi puzzle.</p>
+				</div>
+        
+        <div class='six columns offset-by-one omega'>
+					<h4>Files:</h4>
+          <dl>
+            <dt><a href='https://github.com/bgr/nathans-pl101/blob/master/07-continuations_part1/hanoi.js'>hanoi.js</a></dt>
+            <dt><a href='https://github.com/bgr/nathans-pl101/blob/master/07-continuations_part1/hanoiCPS.js'>hanoiCPS.js</a></dt>
+            <dt><a href='https://github.com/bgr/nathans-pl101/blob/master/07-continuations_part1/hanoiThunked.js'>hanoiThunked.js</a></dt>
+          </dl>
+				</div>
+			</header>
+			
+			<div class='sixteen columns'>
+      
+				<div class='fourteen columns alpha'>
+          <h3>Console of Hanoi</h3>
+          <textarea id='hanoicanvas' class='canvasDrawing'>Press 'Solve' button</textarea>
+				</div>
+				
+				<div class='two columns omega'>
+          <h4>Controls</h4>
+					<label for='numdiscs'>Number of discs:</label>
+            <input type='text' id='numdiscs' value='6'/>
+					<label for='numdiscs'>Refresh frequency (ms):</label>
+            <input type='text' id='numtimeout' value='100'/>
+            
+          <input type='button' id='solvebtn' value='Solve'/>
+          <input type='button' id='stopbtn' value='Stop'/>
+				</div>
+			</div>
+      
+      <div id='push-footer' class='sixteen columns'></div>
+		</div>
+    
+		<footer>
+			<span>go back to <a href='http://bgr.github.com/nathans-pl101'>home</a> &bull; original theme by <a href='http://fublo.github.com/gh-pages-theme/'>Fublo</a></span>
+		</footer>
+		
+	</body>
+</html>
