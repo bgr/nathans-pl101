@@ -10,6 +10,26 @@ String.prototype.repeat = function(times) {
   return new Array(times+1).join(this);
 }
 
+// thunking helpers
+var thunk = function(f, a) {
+  return { tag:'thunk', func:f, args:a };
+}
+var thunkValue = function (v) {
+    return { tag: "value", val: v };
+};
+
+// thunk evaluator
+var trampoline = function (thk) {
+  while (true) {
+    if (thk.tag === "value") {
+      return thk.val;
+    }
+    if (thk.tag === "thunk") {
+      thk = thk.func.apply(null, thk.args);
+    }
+  }
+};
+
 // representation of moving the discs
 // e.g. move discs 1,2 & 3 from first to third peg: new HanoiMove([1,2,3], 0, 2)
 function HanoiMove(discs, src, dest) {
@@ -19,20 +39,31 @@ function HanoiMove(discs, src, dest) {
 }
 
 // returns list of moves required to solve the puzzle
-var hanoi = function(move) {
+var hanoiThunked = function(move, cont) {
   if(!move || move.discs.length == 0) throw new Error('invalid move discs');
   if(move.discs.length == 1) {
-    return [new HanoiMove(move.discs[0], move.src, move.dest)];
+    return thunk(cont, [[new HanoiMove(move.discs[0], move.src, move.dest)]]);
   }
   else {
     var thirdPeg = 3 - (move.src + move.dest); // peg that is neither a source peg nor destination peg
     var allButLast = move.discs.slice(0, move.discs.length-1);
     
-    var movesBefore = hanoi(new HanoiMove(allButLast, move.src, thirdPeg));
-    var singleMove = new HanoiMove(move.discs[move.discs.length-1], move.src, move.dest);
-    var movesAfter = hanoi(new HanoiMove(allButLast, thirdPeg, move.dest));
+    var movesBefore = new HanoiMove(allButLast, move.src, thirdPeg);
+    var singleMove = new HanoiMove([move.discs[move.discs.length-1]], move.src, move.dest);
+    var movesAfter = new HanoiMove(allButLast, thirdPeg, move.dest);
     
-    return movesBefore.concat(singleMove).concat(movesAfter);
+    // get before -> get single -> (concat before with single) -> get after -> (concat before & single with after)
+    var cont_single_after = function(bef) {
+      var cont_after = function(sing) {
+        var cont_concat = function(aft) {
+          return thunk(cont, [bef.concat(sing).concat(aft)]);
+        }
+        return thunk(hanoiThunked, [movesAfter, cont_concat]);
+      }
+      return thunk(hanoiThunked, [singleMove, cont_after]);
+    }
+    
+    return thunk(hanoiThunked, [movesBefore, cont_single_after]);
   }
 }
 
@@ -79,7 +110,7 @@ var printPegs = function(pegs, totalDiscs) {
 
 // out of memory with 25+ elements
 var discsToMove = [1,2,3,4,5,/*6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25*/];
-var solvedMoves = hanoi(new HanoiMove(discsToMove,0,2));
+var solvedMoves = trampoline(hanoiThunked(new HanoiMove(discsToMove,0,2), thunkValue));
 var pegs = [discsToMove.slice(0), [], []];
 
 // draw all the moves

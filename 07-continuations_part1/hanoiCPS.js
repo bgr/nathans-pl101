@@ -19,20 +19,31 @@ function HanoiMove(discs, src, dest) {
 }
 
 // returns list of moves required to solve the puzzle
-var hanoi = function(move) {
+var hanoiCPS = function(move, cont) {
   if(!move || move.discs.length == 0) throw new Error('invalid move discs');
   if(move.discs.length == 1) {
-    return [new HanoiMove(move.discs[0], move.src, move.dest)];
+    return cont([new HanoiMove(move.discs[0], move.src, move.dest)]);
   }
   else {
     var thirdPeg = 3 - (move.src + move.dest); // peg that is neither a source peg nor destination peg
     var allButLast = move.discs.slice(0, move.discs.length-1);
     
-    var movesBefore = hanoi(new HanoiMove(allButLast, move.src, thirdPeg));
-    var singleMove = new HanoiMove(move.discs[move.discs.length-1], move.src, move.dest);
-    var movesAfter = hanoi(new HanoiMove(allButLast, thirdPeg, move.dest));
+    var movesBefore = new HanoiMove(allButLast, move.src, thirdPeg);
+    var singleMove = new HanoiMove([move.discs[move.discs.length-1]], move.src, move.dest);
+    var movesAfter = new HanoiMove(allButLast, thirdPeg, move.dest);
     
-    return movesBefore.concat(singleMove).concat(movesAfter);
+    // get before -> get single -> (concat before with single) -> get after -> (concat before & single with after)
+    var cont_single_after = function(bef) {
+      var cont_after = function(sing) {
+        var cont_concat = function(aft) {
+          return cont(bef.concat(sing).concat(aft));
+        }
+        return hanoiCPS(movesAfter, cont_concat);
+      }
+      return hanoiCPS(singleMove, cont_after);
+    }
+    
+    return hanoiCPS(movesBefore, cont_single_after);
   }
 }
 
@@ -77,9 +88,10 @@ var printPegs = function(pegs, totalDiscs) {
 
 // try it out
 
-// out of memory with 25+ elements
-var discsToMove = [1,2,3,4,5,/*6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25*/];
-var solvedMoves = hanoi(new HanoiMove(discsToMove,0,2));
+// stack size error with 13+ discs
+var discsToMove = [1,2,3,4,5,/*6,7,8,9,10,11,12,13*/];
+var cont = function(v) { return v; }
+var solvedMoves = hanoiCPS(new HanoiMove(discsToMove,0,2), cont);
 var pegs = [discsToMove.slice(0), [], []];
 
 // draw all the moves
