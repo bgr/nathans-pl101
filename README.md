@@ -6,4 +6,4 @@ Homeworks for Nathan's University PL101
 
 
 [pages]: http://bgr.github.com/nathans-pl101
-[nu]: http://nathansuniversity.com/pl101.html
+[nu]: http://web.archive.org/web/20121230234127/http://nathansuniversity.com/pl101.html
